@@ -12,14 +12,20 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.res.painterResource
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.example.shoppinglist.R
+import com.example.shoppinglist.dialog.MainDialog
 import com.example.shoppinglist.navigation.NavigationGraph
 import com.example.shoppinglist.ui.theme.RedLight
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter", "UnusedMaterialScaffoldPaddingParameter")
 @Composable
-fun MainScreen() {
+fun MainScreen(
+    mainNavHostController: NavHostController,
+    viewModel: MainScreenViewModel = hiltViewModel()
+) {
 
     val navController = rememberNavController()
 
@@ -29,7 +35,9 @@ fun MainScreen() {
         },
         floatingActionButton = {
             FloatingActionButton(
-                onClick = {},
+                onClick = {
+                    viewModel.onEvent(MainScreenEvent.OnShowEditDialog)
+                },
                 shape = CircleShape,
                 backgroundColor = RedLight
             ) {
@@ -43,6 +51,9 @@ fun MainScreen() {
         floatingActionButtonPosition = FabPosition.Center,
         isFloatingActionButtonDocked = true
     ) {
-        NavigationGraph(navController)
+        NavigationGraph(navController) { route ->
+            mainNavHostController.navigate(route)
+        }
+        MainDialog(viewModel)
     }
 }

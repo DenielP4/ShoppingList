@@ -1,6 +1,7 @@
 package com.example.shoppinglist.shopping_list_screen
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -25,14 +26,18 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.constraintlayout.compose.ConstraintLayout
 import com.example.shoppinglist.R
+import com.example.shoppinglist.data.ShoppingListItem
 import com.example.shoppinglist.ui.theme.DarkText
 import com.example.shoppinglist.ui.theme.DeleteColor
 import com.example.shoppinglist.ui.theme.EditColor
 import com.example.shoppinglist.ui.theme.LightText
+import com.example.shoppinglist.utils.Routes
 
-@Preview(showBackground = true)
 @Composable
-fun UIShoppingListItem() {
+fun UiShoppingListItem(
+    item: ShoppingListItem,
+    onEvent: (ShoppingListEvent) -> Unit
+) {
     ConstraintLayout(
         modifier = Modifier.padding(
             start = 3.dp, top = 18.dp, end = 3.dp
@@ -47,6 +52,13 @@ fun UIShoppingListItem() {
                     start.linkTo(parent.start)
                     end.linkTo(parent.end)
                 }
+                .clickable {
+                    onEvent(
+                        ShoppingListEvent.OnItemClick(
+                            Routes.ADD_ITEM + "/${item.id}"
+                        )
+                    )
+                }
         ) {
             Column(
                 modifier = Modifier
@@ -54,7 +66,7 @@ fun UIShoppingListItem() {
                     .padding(8.dp)
             ) {
                 Text(
-                    text = "List1",
+                    text = item.name,
                     style = TextStyle(
                         color = DarkText,
                         fontWeight = FontWeight.Bold,
@@ -62,7 +74,7 @@ fun UIShoppingListItem() {
                     )
                 )
                 Text(
-                    text = "12/12/2023 13:00",
+                    text = item.time,
                     style = TextStyle(
                         color = LightText,
                         fontSize = 12.sp
@@ -71,12 +83,15 @@ fun UIShoppingListItem() {
                 LinearProgressIndicator(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(top = 5.dp)
+                        .padding(top = 5.dp),
+                    progress = 0.5f
                 )
             }
         }
         IconButton(
-            onClick = {},
+            onClick = {
+                onEvent(ShoppingListEvent.OnShowDeleteDialog(item))
+            },
             modifier = Modifier
                 .constrainAs(deleteButton) {
                     top.linkTo(card.top)
@@ -96,7 +111,9 @@ fun UIShoppingListItem() {
             )
         }
         IconButton(
-            onClick = {},
+            onClick = {
+                onEvent(ShoppingListEvent.OnShowEditDialog(item))
+            },
             modifier = Modifier
                 .constrainAs(editButton) {
                     top.linkTo(card.top)
@@ -127,7 +144,7 @@ fun UIShoppingListItem() {
             backgroundColor = Color.Yellow
         ) {
             Text(
-                text = "15/5",
+                text = "${item.allItemsCount}/${item.selectedItemsCount}",
                 modifier = Modifier
                     .padding(
                         top = 3.dp,
@@ -135,7 +152,7 @@ fun UIShoppingListItem() {
                         start = 5.dp,
                         end = 5.dp
                     ),
-                color = Color.White
+                color = Color.Black
             )
         }
     }

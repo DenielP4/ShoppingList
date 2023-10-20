@@ -7,7 +7,7 @@ import androidx.room.PrimaryKey
 data class AddItem(
     @PrimaryKey
     val id: Int? = null,
-    val name: String,
+    var name: String,
     val isCheck: Boolean,
     val listId: Int
 )
