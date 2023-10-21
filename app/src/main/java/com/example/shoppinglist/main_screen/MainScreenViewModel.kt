@@ -9,8 +9,11 @@ import com.example.shoppinglist.data.ShoppingListRepository
 import com.example.shoppinglist.dialog.DialogController
 import com.example.shoppinglist.dialog.DialogEvent
 import com.example.shoppinglist.shopping_list_screen.ShoppingListEvent
+import com.example.shoppinglist.utils.Routes
 import com.example.shoppinglist.utils.UiEvent
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -19,7 +22,8 @@ class MainScreenViewModel @Inject constructor(
     private val repository: ShoppingListRepository
 ) : ViewModel(), DialogController {
 
-
+    private val _uiEvent = Channel<UiEvent>()
+    val uiEvent = _uiEvent.receiveAsFlow()
 
     override var dialogTitle = mutableStateOf("Название списка")
         private set
@@ -28,6 +32,9 @@ class MainScreenViewModel @Inject constructor(
     override var openDialog = mutableStateOf(false)
         private set
     override var showEditableText = mutableStateOf(true)
+        private set
+
+    var showFloatingButton = mutableStateOf(true)
         private set
 
     fun onEvent(event: MainScreenEvent){
@@ -46,11 +53,20 @@ class MainScreenViewModel @Inject constructor(
                     )
                 }
             }
-            is MainScreenEvent.OnShowEditDialog -> {
-                openDialog.value = true
+            is MainScreenEvent.OnNewItemClick -> {
+                if (event.route == Routes.SHOPPING_LIST){
+                    openDialog.value = true
+                } else {
+                    sendUiEvent(UiEvent.NavigateMain(Routes.NEW_NOTE))
+                }
             }
-
-            else -> {}
+            is MainScreenEvent.Navigate -> {
+                sendUiEvent(UiEvent.Navigate(event.route))
+                showFloatingButton.value = !(event.route == Routes.ABOUT || event.route == Routes.SETTINGS)
+            }
+            is MainScreenEvent.NavigateMain -> {
+                sendUiEvent(UiEvent.NavigateMain(event.route))
+            }
         }
     }
 
@@ -68,6 +84,12 @@ class MainScreenViewModel @Inject constructor(
             is DialogEvent.OnTextChange -> {
                 editableText.value = event.text
             }
+        }
+    }
+
+    private fun sendUiEvent(event: UiEvent){
+        viewModelScope.launch {
+            _uiEvent.send(event)
         }
     }
 

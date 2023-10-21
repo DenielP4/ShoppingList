@@ -17,6 +17,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.shoppinglist.dialog.MainDialog
+import com.example.shoppinglist.ui.theme.EmptyText
 import com.example.shoppinglist.ui.theme.GrayLight
 import com.example.shoppinglist.utils.UiEvent
 import kotlinx.coroutines.flow.collect
@@ -35,8 +36,7 @@ fun ShoppingListScreen(
                 is UiEvent.Navigate -> {
                     onNavigate(uiEvent.route)
                 }
-                is UiEvent.PopBackStack -> TODO()
-                is UiEvent.ShowSnackBar -> TODO()
+                else -> {}
             }
         }
     }
@@ -61,7 +61,8 @@ fun ShoppingListScreen(
                 .wrapContentHeight(),
             text = "Пустой список",
             fontSize = 25.sp,
-            textAlign = TextAlign.Center
+            textAlign = TextAlign.Center,
+            color = EmptyText
         )
     }
 }

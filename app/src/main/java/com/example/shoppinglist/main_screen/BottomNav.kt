@@ -16,7 +16,8 @@ import com.example.shoppinglist.ui.theme.RedLight
 
 @Composable
 fun BottomNav(
-    navController: NavHostController
+    currentRoute: String?,
+    onNavigate: (String) -> Unit
 ) {
     val listItem = listOf(
         BottomNavItem.ListItem,
@@ -26,12 +27,10 @@ fun BottomNav(
     )
     BottomNavigation(backgroundColor = Color.White) {
         listItem.forEach { bottomNavItem ->
-            val navBackStackEntry by navController.currentBackStackEntryAsState()
-            val currentRoute = navBackStackEntry?.destination?.route
             BottomNavigationItem(
                 selected = currentRoute == bottomNavItem.route,
                 onClick = {
-                    navController.navigate(bottomNavItem.route)
+                    onNavigate(bottomNavItem.route)
                 },
                 icon = {
                     Icon(

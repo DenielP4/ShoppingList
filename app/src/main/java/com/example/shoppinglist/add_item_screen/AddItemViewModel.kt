@@ -12,9 +12,12 @@ import com.example.shoppinglist.data.ShoppingListItem
 import com.example.shoppinglist.dialog.DialogController
 import com.example.shoppinglist.dialog.DialogEvent
 import com.example.shoppinglist.main_screen.MainScreenEvent
+import com.example.shoppinglist.utils.UiEvent
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -23,6 +26,9 @@ class AddItemViewModel @Inject constructor(
     private val repository: AddItemRepository,
     savedStateHandle: SavedStateHandle
 ): ViewModel(), DialogController {
+
+    private val _uiEvent = Channel<UiEvent>()
+    val uiEvent = _uiEvent.receiveAsFlow()
 
     var itemsList: Flow<List<AddItem>>? = null
     var addItem: AddItem? = null
@@ -53,6 +59,17 @@ class AddItemViewModel @Inject constructor(
             is AddItemEvent.OnItemSave -> {
                 viewModelScope.launch {
                     if (listId == -1) return@launch
+                    if (addItem != null) {
+                        if (addItem!!.name.isEmpty()) {
+                            sendUiEvent(UiEvent.ShowSnackBar("Название не может быть пустым!"))
+                            return@launch
+                        }
+                    } else {
+                        if (itemText.value.isEmpty()) {
+                            sendUiEvent(UiEvent.ShowSnackBar("Название не может быть пустым!"))
+                            return@launch
+                        }
+                    }
                     repository.insertItem(
                         AddItem(
                             addItem?.id,
@@ -122,6 +139,12 @@ class AddItemViewModel @Inject constructor(
                     repository.insertItem(shItem)
                 }
             }
+        }
+    }
+
+    private fun sendUiEvent(event: UiEvent){
+        viewModelScope.launch {
+            _uiEvent.send(event)
         }
     }
 

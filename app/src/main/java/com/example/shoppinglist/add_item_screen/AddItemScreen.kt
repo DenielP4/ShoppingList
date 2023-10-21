@@ -21,6 +21,7 @@ import androidx.compose.material.TextFieldDefaults
 
 import androidx.compose.material.rememberScaffoldState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -34,8 +35,10 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.shoppinglist.R
 import com.example.shoppinglist.dialog.MainDialog
 import com.example.shoppinglist.ui.theme.DarkText
+import com.example.shoppinglist.ui.theme.EmptyText
 import com.example.shoppinglist.ui.theme.GrayLight
 import com.example.shoppinglist.ui.theme.RedLight
+import com.example.shoppinglist.utils.UiEvent
 
 @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
 @Composable
@@ -46,6 +49,19 @@ fun AddItemScreen(
     val scaffoldState = rememberScaffoldState()
     val itemsList = viewModel.itemsList?.collectAsState(initial = emptyList())
 
+    LaunchedEffect(key1 = true){
+        viewModel.uiEvent.collect { uiEvent ->
+            when(uiEvent){
+                is UiEvent.ShowSnackBar -> {
+                    scaffoldState.snackbarHostState.showSnackbar(
+                        uiEvent.message
+                    )
+                }
+                else -> {}
+            }
+        }
+    }
+    
     Scaffold(
         scaffoldState = scaffoldState
     ) {
@@ -127,8 +143,10 @@ fun AddItemScreen(
                     .wrapContentHeight(),
                 text = "Пустой список",
                 fontSize = 25.sp,
-                textAlign = TextAlign.Center
+                textAlign = TextAlign.Center,
+                color = EmptyText
             )
         }
     }
+
 }
