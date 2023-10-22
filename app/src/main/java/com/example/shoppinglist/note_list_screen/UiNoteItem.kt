@@ -18,12 +18,17 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.shoppinglist.data.NoteItem
+import com.example.shoppinglist.shopping_list_screen.ShoppingListEvent
 import com.example.shoppinglist.ui.theme.LightText
 import com.example.shoppinglist.ui.theme.RedLight
+import com.example.shoppinglist.utils.Routes
 
-@Preview(showBackground = true)
 @Composable
-fun UiNoteItem() {
+fun UiNoteItem(
+    item: NoteItem,
+    onEvent: (NoteListEvent) -> Unit
+) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
@@ -33,7 +38,11 @@ fun UiNoteItem() {
                 end = 3.dp
             )
             .clickable {
-
+                onEvent(
+                    NoteListEvent.OnItemClick(
+                        Routes.NEW_NOTE + "/${item.id}"
+                    )
+                )
             }
     ) {
         Column(
@@ -49,7 +58,7 @@ fun UiNoteItem() {
                             start = 10.dp
                         )
                         .weight(1f),
-                    text = "Note 1",
+                    text = item.title,
                     fontSize = 16.sp,
                     fontWeight = FontWeight.Bold
                 )
@@ -59,7 +68,7 @@ fun UiNoteItem() {
                             top = 10.dp,
                             end = 10.dp
                         ),
-                    text = "12/12/2023 13:00",
+                    text = item.time,
                     color = RedLight,
                     fontSize = 12.sp
                 )
@@ -75,10 +84,7 @@ fun UiNoteItem() {
                             bottom = 10.dp
                         )
                         .weight(1f),
-                    text = "Блаблаблаблаблаблаблаблаблаблаблаблаблаблаблаблаблаблаблбалблаблаблаблабла" +
-                            "sdkfs;lkfd;alkdfl;ak;ldfka;kfa;ldkf;lakfd;ladkf;ladk;lkfad;lkfa;'" +
-                            "adlkfjaldjflkajdflkajdfljaldkfjalkdjflkajdflkj" +
-                            ";adklfal;dfka;ldkfa;kdf;ladkf;ladkdf;al'dfkaldkl",
+                    text = item.description,
                     fontSize = 12.sp,
                     maxLines = 2,
                     overflow = TextOverflow.Ellipsis,
@@ -86,7 +92,7 @@ fun UiNoteItem() {
                 )
                 IconButton(
                     onClick = {
-
+                        onEvent(NoteListEvent.OnShowDeleteDialog(item))
                     }
                 ) {
                     Icon(

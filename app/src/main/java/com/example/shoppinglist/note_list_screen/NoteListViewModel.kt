@@ -33,7 +33,7 @@ class NoteListViewModel @Inject constructor(
         private set
     override var openDialog = mutableStateOf(false)
         private set
-    override var showEditableText = mutableStateOf(true)
+    override var showEditableText = mutableStateOf(false)
         private set
 
     fun onEvent(event: NoteListEvent) {
@@ -43,7 +43,12 @@ class NoteListViewModel @Inject constructor(
                 noteItem = event.item
             }
             is NoteListEvent.OnItemClick -> {
-                sendUiEvent(UiEvent.NavigateMain(event.route))
+                sendUiEvent(UiEvent.Navigate(event.route))
+            }
+            is NoteListEvent.UbDoneDeleteItem -> {
+                viewModelScope.launch {
+                    repository.insertItem(noteItem!!)
+                }
             }
         }
     }
@@ -56,6 +61,7 @@ class NoteListViewModel @Inject constructor(
             is DialogEvent.OnConfirm -> {
                 viewModelScope.launch {
                     repository.deleteItem(noteItem!!)
+                    sendUiEvent(UiEvent.ShowSnackBar("Отменить удаление?"))
                 }
                 openDialog.value = false
             }

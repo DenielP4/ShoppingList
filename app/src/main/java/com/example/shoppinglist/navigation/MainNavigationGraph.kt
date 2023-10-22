@@ -13,7 +13,6 @@ import com.example.shoppinglist.about_screen.AboutScreen
 import com.example.shoppinglist.add_item_screen.AddItemScreen
 import com.example.shoppinglist.main_screen.MainScreen
 import com.example.shoppinglist.new_note_screen.NewNoteScreen
-import com.example.shoppinglist.note_list_screen.NoteListScreen
 import com.example.shoppinglist.settings_screen.SettingsScreen
 import com.example.shoppinglist.shopping_list_screen.ShoppingListScreen
 import com.example.shoppinglist.utils.Routes
@@ -27,8 +26,8 @@ fun MainNavigationGraph() {
         composable(Routes.ADD_ITEM + "/{listId}") {
             AddItemScreen()
         }
-        composable(Routes.NEW_NOTE) {
-            NewNoteScreen(){
+        composable(Routes.NEW_NOTE + "/{noteId}") {
+            NewNoteScreen() {
                 navController.popBackStack()
             }
         }
