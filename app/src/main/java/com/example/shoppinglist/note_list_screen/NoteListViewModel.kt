@@ -6,19 +6,22 @@ import androidx.lifecycle.viewModelScope
 import com.example.shoppinglist.add_item_screen.AddItemEvent
 import com.example.shoppinglist.data.NoteItem
 import com.example.shoppinglist.data.NoteItemRepository
+import com.example.shoppinglist.datastore.DataStoreManager
 import com.example.shoppinglist.dialog.DialogController
 import com.example.shoppinglist.dialog.DialogEvent
 import com.example.shoppinglist.utils.Routes
 import com.example.shoppinglist.utils.UiEvent
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
 class NoteListViewModel @Inject constructor(
-    private val repository: NoteItemRepository
+    private val repository: NoteItemRepository,
+    dataStoreManager: DataStoreManager
 ): ViewModel(), DialogController {
 
     val noteList = repository.getAllItems()
@@ -26,6 +29,8 @@ class NoteListViewModel @Inject constructor(
 
     private val _uiEvent = Channel<UiEvent>()
     val uiEvent = _uiEvent.receiveAsFlow()
+
+    var titleColor = mutableStateOf("#C31E12")
 
     override var dialogTitle = mutableStateOf("Удалить заметку?")
         private set
@@ -35,6 +40,17 @@ class NoteListViewModel @Inject constructor(
         private set
     override var showEditableText = mutableStateOf(false)
         private set
+
+    init {
+        viewModelScope.launch {
+            dataStoreManager.getStringPreference(
+                DataStoreManager.TITLE_COLOR,
+                "#C31E12"
+            ).collect{ color ->
+                titleColor.value = color
+            }
+        }
+    }
 
     fun onEvent(event: NoteListEvent) {
         when(event){
