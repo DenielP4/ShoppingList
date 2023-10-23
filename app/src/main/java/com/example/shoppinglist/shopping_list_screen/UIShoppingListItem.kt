@@ -31,6 +31,8 @@ import com.example.shoppinglist.ui.theme.DarkText
 import com.example.shoppinglist.ui.theme.DeleteColor
 import com.example.shoppinglist.ui.theme.EditColor
 import com.example.shoppinglist.ui.theme.LightText
+import com.example.shoppinglist.ui.theme.RedLight
+import com.example.shoppinglist.utils.ProgressHelper
 import com.example.shoppinglist.utils.Routes
 
 @Composable
@@ -84,7 +86,8 @@ fun UiShoppingListItem(
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(top = 5.dp),
-                    progress = 0.5f
+                    progress = ProgressHelper.getProgress(item.allItemsCount, item.selectedItemsCount),
+                    color = RedLight
                 )
             }
         }

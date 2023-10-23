@@ -9,6 +9,7 @@ import com.example.shoppinglist.data.ShoppingListRepository
 import com.example.shoppinglist.dialog.DialogEvent
 import com.example.shoppinglist.dialog.DialogController
 import com.example.shoppinglist.utils.UiEvent
+import com.example.shoppinglist.utils.getCurrentTime
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.receiveAsFlow
@@ -44,7 +45,7 @@ class ShoppingListViewModel @Inject constructor(
                         ShoppingListItem(
                             listItem?.id,
                             editableText.value,
-                            "12/12/2023 13:00",
+                            listItem?.time ?: getCurrentTime(),
                             listItem?.allItemsCount ?: 0,
                             listItem?.selectedItemsCount ?: 0
                         )
