@@ -1,6 +1,8 @@
 package com.example.shoppinglist.note_list_screen
 
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.shoppinglist.add_item_screen.AddItemEvent
@@ -24,13 +26,19 @@ class NoteListViewModel @Inject constructor(
     dataStoreManager: DataStoreManager
 ): ViewModel(), DialogController {
 
-    val noteList = repository.getAllItems()
+    private val noteListFlow = repository.getAllItems()
     private var noteItem: NoteItem? = null
+
+    var noteList by mutableStateOf(listOf<NoteItem>())
+    var originNoteList = listOf<NoteItem>()
 
     private val _uiEvent = Channel<UiEvent>()
     val uiEvent = _uiEvent.receiveAsFlow()
 
     var titleColor = mutableStateOf("#C31E12")
+
+    var searchText by mutableStateOf("")
+        private set
 
     override var dialogTitle = mutableStateOf("Удалить заметку?")
         private set
@@ -50,6 +58,13 @@ class NoteListViewModel @Inject constructor(
                 titleColor.value = color
             }
         }
+
+        viewModelScope.launch {
+            noteListFlow.collect{ list ->
+                noteList = list
+                originNoteList = list
+            }
+        }
     }
 
     fun onEvent(event: NoteListEvent) {
@@ -64,6 +79,12 @@ class NoteListViewModel @Inject constructor(
             is NoteListEvent.UbDoneDeleteItem -> {
                 viewModelScope.launch {
                     repository.insertItem(noteItem!!)
+                }
+            }
+            is NoteListEvent.OnTextSearchChange -> {
+                searchText = event.text
+                noteList = originNoteList.filter { note ->
+                    note.title.lowercase().startsWith(searchText.lowercase())
                 }
             }
         }

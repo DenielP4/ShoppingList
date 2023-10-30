@@ -103,6 +103,8 @@ class AddItemViewModel @Inject constructor(
                 }
                 updateShoppingListCount()
             }
+
+            else -> {}
         }
     }
 
@@ -121,6 +123,8 @@ class AddItemViewModel @Inject constructor(
             is DialogEvent.OnTextChange -> {
                 editableText.value = event.text
             }
+
+            else -> {}
         }
     }
 

@@ -27,6 +27,7 @@ import androidx.compose.ui.unit.sp
 import androidx.constraintlayout.compose.ConstraintLayout
 import com.example.shoppinglist.R
 import com.example.shoppinglist.data.ShoppingListItem
+import com.example.shoppinglist.settings_screen.ColorUtils
 import com.example.shoppinglist.ui.theme.DarkText
 import com.example.shoppinglist.ui.theme.DeleteColor
 import com.example.shoppinglist.ui.theme.EditColor
@@ -40,6 +41,9 @@ fun UiShoppingListItem(
     item: ShoppingListItem,
     onEvent: (ShoppingListEvent) -> Unit
 ) {
+
+    var progress = ProgressHelper.getProgress(item.allItemsCount, item.selectedItemsCount)
+
     ConstraintLayout(
         modifier = Modifier.padding(
             start = 3.dp, top = 18.dp, end = 3.dp
@@ -86,8 +90,8 @@ fun UiShoppingListItem(
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(top = 5.dp),
-                    progress = ProgressHelper.getProgress(item.allItemsCount, item.selectedItemsCount),
-                    color = RedLight
+                    progress = progress,
+                    color = ColorUtils.getProgressColor(progress)
                 )
             }
         }

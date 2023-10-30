@@ -57,6 +57,15 @@ class NewNoteViewModel @Inject constructor(
                     titleColor.value = color
                 }
             }
+        } else {
+            viewModelScope.launch {
+                dataStoreManager.getStringPreference(
+                    DataStoreManager.TITLE_COLOR,
+                    "#C31E12"
+                ).collect{ color ->
+                    titleColor.value = color
+                }
+            }
         }
     }
 
