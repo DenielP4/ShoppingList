@@ -11,7 +11,9 @@ import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material.Button
 import androidx.compose.material.Card
+import androidx.compose.material.Checkbox
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
 import androidx.compose.material.Scaffold
@@ -25,6 +27,9 @@ import androidx.compose.material.rememberScaffoldState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -42,7 +47,7 @@ import com.example.shoppinglist.ui.theme.GrayLight
 import com.example.shoppinglist.ui.theme.RedLight
 import com.example.shoppinglist.utils.UiEvent
 
-@SuppressLint("UnusedMaterialScaffoldPaddingParameter")
+@SuppressLint("UnusedMaterialScaffoldPaddingParameter", "UnrememberedMutableState")
 @Composable
 fun AddItemScreen(
     viewModel: AddItemViewModel = hiltViewModel()
@@ -51,19 +56,21 @@ fun AddItemScreen(
     val scaffoldState = rememberScaffoldState()
     val itemsList = viewModel.itemsList?.collectAsState(initial = emptyList())
 
-    LaunchedEffect(key1 = true){
+
+    LaunchedEffect(key1 = true) {
         viewModel.uiEvent.collect { uiEvent ->
-            when(uiEvent){
+            when (uiEvent) {
                 is UiEvent.ShowSnackBar -> {
                     scaffoldState.snackbarHostState.showSnackbar(
                         uiEvent.message
                     )
                 }
+
                 else -> {}
             }
         }
     }
-    
+
     Scaffold(
         scaffoldState = scaffoldState,
         snackbarHost = {
@@ -80,6 +87,16 @@ fun AddItemScreen(
                 .fillMaxSize()
                 .background(GrayLight)
         ) {
+            Text(
+                text = viewModel.currentList
+            )
+            Text(
+                text = viewModel.currentBudget.toString(),
+                color = viewModel.colorBudget
+            )
+            Text(
+                text = viewModel.basket.toString()
+            )
             Card(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -113,6 +130,12 @@ fun AddItemScreen(
                         ),
                         singleLine = true
                     )
+                    Checkbox(
+                        checked = viewModel.isPriority.value,
+                        onCheckedChange = { priority ->
+                            viewModel.onEvent(AddItemEvent.OnPriorityChange(priority))
+                        }
+                    )
                     IconButton(
                         onClick = {
                             viewModel.onEvent(AddItemEvent.OnItemSave)
@@ -134,7 +157,8 @@ fun AddItemScreen(
                     )
             ) {
                 if (itemsList != null) {
-                    items(itemsList.value) { item ->
+                    val sortedList = itemsList.value.sortedByDescending { item -> item.priority }
+                    items(sortedList) { item ->
                         UiAddItem(
                             item = item,
                             onEvent = { event ->
@@ -143,6 +167,15 @@ fun AddItemScreen(
                         )
                     }
                 }
+            }
+            Button(
+                onClick = {
+                    viewModel.onEvent(AddItemEvent.OnGenerateReceipt)
+                }
+            ) {
+                Text(
+                    text = "Ваш чек!"
+                )
             }
         }
         MainDialog(viewModel)

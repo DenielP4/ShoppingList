@@ -34,6 +34,18 @@ class MainScreenViewModel @Inject constructor(
         private set
     override var showEditableText = mutableStateOf(true)
         private set
+    override var budgetNumber = mutableStateOf("0")
+        private set
+    override var showBudgetNumber = mutableStateOf(true)
+        private set
+    override var countNumber = mutableStateOf("0")
+        private set
+    override var showCountNumber = mutableStateOf(false)
+        private set
+    override var priceNumber = mutableStateOf("0")
+        private set
+    override var showPriceNumber = mutableStateOf(false)
+        private set
 
     var showFloatingButton = mutableStateOf(true)
         private set
@@ -41,7 +53,7 @@ class MainScreenViewModel @Inject constructor(
     fun onEvent(event: MainScreenEvent){
         when(event){
             is MainScreenEvent.OnItemSave -> {
-                if (editableText.value.isEmpty()) return
+                if (editableText.value.isEmpty() || budgetNumber.value.isEmpty() || budgetNumber.value == "0") return
                 viewModelScope.launch {
                     repository.insertItem(
                         ShoppingListItem(
@@ -49,7 +61,8 @@ class MainScreenViewModel @Inject constructor(
                             editableText.value,
                             getCurrentTime(),
                             0,
-                            0
+                            0,
+                            budgetNumber.value.toInt()
                         )
                     )
                 }
@@ -81,10 +94,15 @@ class MainScreenViewModel @Inject constructor(
                 onEvent(MainScreenEvent.OnItemSave)
                 openDialog.value = false
                 editableText.value = ""
+                budgetNumber.value = "0"
             }
             is DialogEvent.OnTextChange -> {
                 editableText.value = event.text
             }
+            is DialogEvent.OnBudgetChange -> {
+                budgetNumber.value = event.budget
+            }
+            else -> {}
         }
     }
 

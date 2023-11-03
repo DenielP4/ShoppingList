@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.AlertDialog
 import androidx.compose.material.Text
 import androidx.compose.material.TextButton
@@ -15,6 +16,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.shoppinglist.ui.theme.DarkText
@@ -63,6 +65,77 @@ fun MainDialog(
                                 color = DarkText,
                                 fontSize = 16.sp
                             )
+                        )
+                    }
+                    Spacer(modifier = Modifier.height(10.dp))
+                    if (dialogController.showPriceNumber.value) {
+                        TextField(
+                            value = dialogController.priceNumber.value,
+                            onValueChange = { price ->
+                                dialogController.onDialogEvent(DialogEvent.OnPriceChange(price))
+                            },
+                            label = {
+                                Text(text = "Цена товара")
+                            },
+                            singleLine = true,
+                            colors = TextFieldDefaults.textFieldColors(
+                                backgroundColor = GrayLight,
+                                focusedIndicatorColor = Color.Transparent,
+                                unfocusedIndicatorColor = Color.Transparent
+                            ),
+                            shape = RoundedCornerShape(9.dp),
+                            textStyle = TextStyle(
+                                color = DarkText,
+                                fontSize = 16.sp
+                            ),
+                            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
+                        )
+                    }
+                    Spacer(modifier = Modifier.height(10.dp))
+                    if (dialogController.showBudgetNumber.value) {
+                        TextField(
+                            value = dialogController.budgetNumber.value.toString(),
+                            onValueChange = {budget ->
+                                dialogController.onDialogEvent(DialogEvent.OnBudgetChange(budget))
+                            },
+                            label = {
+                                Text(text = "Бюджет")
+                            },
+                            singleLine = true,
+                            colors = TextFieldDefaults.textFieldColors(
+                                backgroundColor = GrayLight,
+                                focusedIndicatorColor = Color.Transparent,
+                                unfocusedIndicatorColor = Color.Transparent
+                            ),
+                            shape = RoundedCornerShape(9.dp),
+                            textStyle = TextStyle(
+                                color = DarkText,
+                                fontSize = 16.sp
+                            ),
+                            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
+                        )
+                    }
+                    if (dialogController.showCountNumber.value) {
+                        TextField(
+                            value = dialogController.countNumber.value,
+                            onValueChange = { count ->
+                                dialogController.onDialogEvent(DialogEvent.OnCountChange(count))
+                            },
+                            label = {
+                                Text(text = "Количество")
+                            },
+                            singleLine = true,
+                            colors = TextFieldDefaults.textFieldColors(
+                                backgroundColor = GrayLight,
+                                focusedIndicatorColor = Color.Transparent,
+                                unfocusedIndicatorColor = Color.Transparent
+                            ),
+                            shape = RoundedCornerShape(9.dp),
+                            textStyle = TextStyle(
+                                color = DarkText,
+                                fontSize = 16.sp
+                            ),
+                            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
                         )
                     }
                 }

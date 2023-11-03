@@ -2,12 +2,17 @@ package com.example.shoppinglist.add_item_screen
 
 import android.util.Log
 import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.graphics.Color
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.shoppinglist.data.AddItem
 import com.example.shoppinglist.data.AddItemRepository
+//import com.example.shoppinglist.data.ReceiptListRepository
 import com.example.shoppinglist.data.ShoppingListItem
 import com.example.shoppinglist.dialog.DialogController
 import com.example.shoppinglist.dialog.DialogEvent
@@ -24,6 +29,7 @@ import javax.inject.Inject
 @HiltViewModel
 class AddItemViewModel @Inject constructor(
     private val repository: AddItemRepository,
+//    private val repositoryReceipt: ReceiptListRepository,
     savedStateHandle: SavedStateHandle
 ): ViewModel(), DialogController {
 
@@ -33,25 +39,46 @@ class AddItemViewModel @Inject constructor(
     var itemsList: Flow<List<AddItem>>? = null
     var addItem: AddItem? = null
     var shoppingListItem: ShoppingListItem? = null
+    var currentBudget by mutableStateOf(0)
+    var currentList by mutableStateOf("")
+    var basket by mutableStateOf(0)
+    var colorBudget by mutableStateOf(Color.Green)
     var listId: Int = -1
     init {
         listId = savedStateHandle.get<String>("listId")?.toInt()!!
         itemsList = repository.getAllItemsById(listId)
         viewModelScope.launch {
             shoppingListItem = repository.getListItemById(listId)
+            currentList = shoppingListItem?.name!!
+            currentBudget = shoppingListItem?.budget!!
+            updateBasket()
         }
     }
 
     var itemText = mutableStateOf("")
         private set
+    var isPriority = mutableStateOf(false)
+        private set
 
-    override var dialogTitle = mutableStateOf("Изменить наименование:")
+    override var dialogTitle = mutableStateOf("")
         private set
     override var editableText = mutableStateOf("")
         private set
     override var openDialog = mutableStateOf(false)
         private set
     override var showEditableText = mutableStateOf(true)
+        private set
+    override var budgetNumber = mutableStateOf("0")
+        private set
+    override var showBudgetNumber = mutableStateOf(false)
+        private set
+    override var countNumber = mutableStateOf("0")
+        private set
+    override var showCountNumber = mutableStateOf(true)
+        private set
+    override var priceNumber = mutableStateOf("0")
+        private set
+    override var showPriceNumber = mutableStateOf(true)
         private set
 
     fun onEvent(event: AddItemEvent) {
@@ -75,11 +102,16 @@ class AddItemViewModel @Inject constructor(
                             addItem?.id,
                             addItem?.name ?: itemText.value,
                             addItem?.isCheck ?: false,
-                            listId
+                            listId,
+                            addItem?.priority ?: isPriority.value,
+                            addItem?.count ?: 0,
+                            addItem?.price ?: 0,
+                            addItem?.finalSum(addItem?.price ?: 0, addItem?.count?: 0) ?: 0
                         )
                     )
                 }
                 itemText.value = ""
+                isPriority.value = false
                 addItem = null
                 updateShoppingListCount()
             }
@@ -87,6 +119,8 @@ class AddItemViewModel @Inject constructor(
                 addItem = event.item
                 openDialog.value = true
                 editableText.value = event.item.name
+                countNumber.value = event.item.count.toString()
+                priceNumber.value = event.item.price.toString()
             }
             is AddItemEvent.OnTextChange -> {
                 itemText.value = event.text
@@ -103,8 +137,17 @@ class AddItemViewModel @Inject constructor(
                 }
                 updateShoppingListCount()
             }
-
-            else -> {}
+            is AddItemEvent.OnPriorityChange -> {
+                isPriority.value = !isPriority.value
+            }
+            is AddItemEvent.OnGenerateReceipt -> {
+                viewModelScope.launch {
+                    itemsList?.collect{ list ->
+                        val listCheckedItems = list.filter { it.isCheck }
+                        Log.d("List", "$listCheckedItems")
+                    }
+                }
+            }
         }
     }
 
@@ -116,18 +159,49 @@ class AddItemViewModel @Inject constructor(
             }
             is DialogEvent.OnConfirm -> {
                 openDialog.value = false
-                addItem = addItem?.copy(name = editableText.value)
+                addItem = addItem?.copy(
+                    name = editableText.value,
+                    count = if (countNumber.value.toIntOrNull() != null) countNumber.value.toInt() else {
+                    sendUiEvent(UiEvent.ShowSnackBar("В поле <Количетсво> можно писать только числа!"))
+                    return
+                },
+                    price = if (priceNumber.value.toIntOrNull() != null) priceNumber.value.toInt() else {
+                        sendUiEvent(UiEvent.ShowSnackBar("В поле <Цена> можно писать только числа!"))
+                        return
+                    }
+                )
                 editableText.value = ""
+                countNumber.value = "0"
+                priceNumber.value = "0"
                 onEvent(AddItemEvent.OnItemSave)
             }
             is DialogEvent.OnTextChange -> {
                 editableText.value = event.text
             }
-
+            is DialogEvent.OnPriceChange -> {
+                priceNumber.value = event.price
+            }
+            is DialogEvent.OnCountChange -> {
+                countNumber.value = event.count
+            }
             else -> {}
         }
     }
 
+    private fun updateBasket(){
+        viewModelScope.launch {
+            itemsList?.collect{ list ->
+                val sum = list.sumOf { it.sum }
+                basket = sum
+                Log.d("basket", "$basket")
+                checkBasket()
+            }
+        }
+    }
+
+    private fun checkBasket(){
+        colorBudget = if (basket>currentBudget) Color.Red else Color.Green
+    }
     private fun updateShoppingListCount(){
         viewModelScope.launch {
             itemsList?.collect { list ->

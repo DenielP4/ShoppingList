@@ -10,5 +10,6 @@ data class ShoppingListItem(
     val name: String,
     val time: String,
     val allItemsCount: Int,
-    val selectedItemsCount: Int
+    val selectedItemsCount: Int,
+    val budget: Int
 )

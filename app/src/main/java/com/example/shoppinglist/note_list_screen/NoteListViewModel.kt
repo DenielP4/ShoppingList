@@ -1,5 +1,6 @@
 package com.example.shoppinglist.note_list_screen
 
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -47,6 +48,18 @@ class NoteListViewModel @Inject constructor(
     override var openDialog = mutableStateOf(false)
         private set
     override var showEditableText = mutableStateOf(false)
+        private set
+    override var budgetNumber = mutableStateOf("0")
+        private set
+    override var showBudgetNumber = mutableStateOf(false)
+        private set
+    override var countNumber = mutableStateOf("0")
+        private set
+    override var showCountNumber = mutableStateOf(false)
+        private set
+    override var priceNumber = mutableStateOf("0")
+        private set
+    override var showPriceNumber = mutableStateOf(false)
         private set
 
     init {

@@ -7,6 +7,7 @@ import com.example.shoppinglist.data.AddItemRepositoryImpl
 import com.example.shoppinglist.data.MainDb
 import com.example.shoppinglist.data.NoteItemRepository
 import com.example.shoppinglist.data.NoteItemRepositoryImpl
+
 import com.example.shoppinglist.data.ShoppingListDao
 import com.example.shoppinglist.data.ShoppingListRepository
 import com.example.shoppinglist.data.ShoppingListRepositoryImpl
@@ -47,6 +48,12 @@ object AppModule {
     fun provideNoteItemRepository(db: MainDb): NoteItemRepository{
         return NoteItemRepositoryImpl(db.noteItemDao)
     }
+
+//    @Provides
+//    @Singleton
+//    fun provideReceiptItemRepository(db: MainDb): ReceiptListRepository{
+//        return ReceiptListRepositoryImpl(db.receiptListDao)
+//    }
 
     @Provides
     @Singleton

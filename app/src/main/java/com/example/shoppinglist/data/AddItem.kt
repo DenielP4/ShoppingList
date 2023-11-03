@@ -9,5 +9,11 @@ data class AddItem(
     val id: Int? = null,
     var name: String,
     val isCheck: Boolean,
-    val listId: Int
-)
+    val listId: Int,
+    val priority: Boolean,
+    val count: Int,
+    val price: Int,
+    val sum: Int
+) {
+    fun finalSum(price: Int, count: Int): Int = price*count
+}

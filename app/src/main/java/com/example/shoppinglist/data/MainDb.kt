@@ -8,15 +8,14 @@ import androidx.room.RoomDatabase
     entities = [
         ShoppingListItem::class,
         AddItem::class,
-        NoteItem::class
+        NoteItem::class,
+//        ReceiptListItem::class
         // Простая миграция
 //    CheckItem::class
     ],
-    version = 1
-    // Простая миграция
-//    autoMigrations = [AutoMigration(from = 1, to = 2, spec = MainDb.RenameShopList::class)],
-//    version = 2,
-//    exportSchema = true
+    //    autoMigrations = [AutoMigration(from = 1, to = 2, spec = MainDb.RenameShopList::class)],
+    version = 1,
+    exportSchema = true
 )
 abstract class MainDb : RoomDatabase() {
     // Сложная миграция
@@ -25,4 +24,5 @@ abstract class MainDb : RoomDatabase() {
     abstract val shoppingListDao: ShoppingListDao
     abstract val noteItemDao: NoteItemDao
     abstract val addItemDao: AddItemDao
+//    abstract val receiptListDao: ReceiptListDao
 }

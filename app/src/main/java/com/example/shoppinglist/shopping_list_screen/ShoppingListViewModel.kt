@@ -35,11 +35,23 @@ class ShoppingListViewModel @Inject constructor(
         private set
     override var showEditableText = mutableStateOf(false)
         private set
+    override var budgetNumber = mutableStateOf("0")
+        private set
+    override var showBudgetNumber = mutableStateOf(false)
+        private set
+    override var countNumber = mutableStateOf("0")
+        private set
+    override var showCountNumber = mutableStateOf(false)
+        private set
+    override var priceNumber = mutableStateOf("0")
+        private set
+    override var showPriceNumber = mutableStateOf(false)
+        private set
 
     fun onEvent(event: ShoppingListEvent){
         when(event){
             is ShoppingListEvent.OnItemSave -> {
-                if (editableText.value.isEmpty()) return
+                if (editableText.value.isEmpty() || budgetNumber.value.isEmpty() || budgetNumber.value == "0") return
                 viewModelScope.launch {
                     repository.insertItem(
                         ShoppingListItem(
@@ -47,7 +59,8 @@ class ShoppingListViewModel @Inject constructor(
                             editableText.value,
                             listItem?.time ?: getCurrentTime(),
                             listItem?.allItemsCount ?: 0,
-                            listItem?.selectedItemsCount ?: 0
+                            listItem?.selectedItemsCount ?: 0,
+                            budgetNumber.value.toInt()
                         )
                     )
                 }
@@ -59,14 +72,17 @@ class ShoppingListViewModel @Inject constructor(
                 listItem = event.item
                 openDialog.value = true
                 editableText.value = listItem?.name ?: ""
+                budgetNumber.value = listItem?.budget.toString() ?: ""
                 dialogTitle.value = "Название списка"
                 showEditableText.value = true
+                showBudgetNumber.value = true
             }
             is ShoppingListEvent.OnShowDeleteDialog -> {
                 listItem = event.item
                 openDialog.value = true
                 dialogTitle.value = "Удалить список"
                 showEditableText.value = false
+                showBudgetNumber.value = false
             }
         }
     }
@@ -89,6 +105,10 @@ class ShoppingListViewModel @Inject constructor(
             is DialogEvent.OnTextChange -> {
                 editableText.value = event.text
             }
+            is DialogEvent.OnBudgetChange -> {
+                budgetNumber.value = event.budget
+            }
+            else -> {}
         }
     }
 

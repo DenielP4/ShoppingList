@@ -30,24 +30,24 @@ fun ShoppingListScreen(
 
     val itemsList = viewModel.list.collectAsState(initial = emptyList())
 
-    LaunchedEffect(key1 = true){
+    LaunchedEffect(key1 = true) {
         viewModel.uiEvent.collect { uiEvent ->
-            when(uiEvent){
+            when (uiEvent) {
                 is UiEvent.Navigate -> {
                     onNavigate(uiEvent.route)
                 }
+
                 else -> {}
             }
         }
     }
-
     LazyColumn(
         modifier = Modifier
             .fillMaxSize()
             .background(GrayLight),
         contentPadding = PaddingValues(bottom = 100.dp)
     ) {
-        items(itemsList.value){item ->
+        items(itemsList.value) { item ->
             UiShoppingListItem(item) { event ->
                 viewModel.onEvent(event)
             }
