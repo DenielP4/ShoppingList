@@ -12,12 +12,16 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.shoppinglist.data.AddItem
 import com.example.shoppinglist.data.AddItemRepository
-//import com.example.shoppinglist.data.ReceiptListRepository
+import com.example.shoppinglist.data.ReceiptListItem
 import com.example.shoppinglist.data.ShoppingListItem
 import com.example.shoppinglist.dialog.DialogController
 import com.example.shoppinglist.dialog.DialogEvent
 import com.example.shoppinglist.main_screen.MainScreenEvent
+import com.example.shoppinglist.receipt_dialog.ReceiptDialogController
+import com.example.shoppinglist.receipt_dialog.ReceiptDialogEvent
+import com.example.shoppinglist.ui.theme.GrayLight
 import com.example.shoppinglist.utils.UiEvent
+import com.example.shoppinglist.utils.getCurrentTime
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
@@ -29,20 +33,23 @@ import javax.inject.Inject
 @HiltViewModel
 class AddItemViewModel @Inject constructor(
     private val repository: AddItemRepository,
-//    private val repositoryReceipt: ReceiptListRepository,
     savedStateHandle: SavedStateHandle
-) : ViewModel(), DialogController {
+) : ViewModel(), DialogController, ReceiptDialogController {
 
     private val _uiEvent = Channel<UiEvent>()
     val uiEvent = _uiEvent.receiveAsFlow()
 
     var itemsList: Flow<List<AddItem>>? = null
     var addItem: AddItem? = null
+
+    var receiptItem: ReceiptListItem? = null
     var shoppingListItem: ShoppingListItem? = null
     var currentBudget by mutableStateOf(0)
     var currentList by mutableStateOf("")
     var basket by mutableStateOf(0)
+    var listCheckedItems by mutableStateOf(emptyList<AddItem>())
     var colorBudget by mutableStateOf(Color.Green)
+    var colorReceipt by mutableStateOf(GrayLight)
     var listId: Int = -1
 
     init {
@@ -53,6 +60,8 @@ class AddItemViewModel @Inject constructor(
             currentList = shoppingListItem?.name!!
             currentBudget = shoppingListItem?.budget!!
         }
+        updateListChekedItem()
+        updateBasket()
     }
 
     var itemText = mutableStateOf("")
@@ -80,6 +89,14 @@ class AddItemViewModel @Inject constructor(
         private set
     override var showPriceNumber = mutableStateOf(true)
         private set
+
+    override var dialogTitleReceipt = mutableStateOf("")
+        private set
+    override var openReceiptDialog = mutableStateOf(false)
+        private set
+    override var receipt: ReceiptListItem = ReceiptListItem(null, "", "", 0, emptyList())
+        private set
+
 
     fun onEvent(event: AddItemEvent) {
         when (event) {
@@ -137,7 +154,7 @@ class AddItemViewModel @Inject constructor(
 
             is AddItemEvent.OnCheckedChange -> {
                 viewModelScope.launch {
-                    if (event.item.price !=0)
+                    if (event.item.price != 0)
                         repository.insertItem(event.item)
                     else
                         sendUiEvent(UiEvent.ShowSnackBar("Укажите цену и количество товара <${event.item.name}>"))
@@ -151,12 +168,23 @@ class AddItemViewModel @Inject constructor(
             }
 
             is AddItemEvent.OnGenerateReceipt -> {
-                viewModelScope.launch {
-                    itemsList?.collect { list ->
-                        val listCheckedItems = list.filter { it.isCheck }
-                        Log.d("List", "$listCheckedItems")
+                if (basket == 0)
+                    sendUiEvent(UiEvent.ShowSnackBar("Сначала добавьте товар в корзину!"))
+                else {
+                    viewModelScope.launch {
+                        receiptItem = ReceiptListItem(
+                            receiptItem?.receiptId,
+                            shoppingListItem!!.name,
+                            getCurrentTime(),
+                            basket,
+                            listCheckedItems
+                        )
+                        Log.d("Receipt", "$receiptItem")
                     }
+                    openReceiptDialog.value = true
+                    receipt = receiptItem!!
                 }
+
             }
         }
     }
@@ -203,6 +231,14 @@ class AddItemViewModel @Inject constructor(
         }
     }
 
+    private fun updateListChekedItem() {
+        viewModelScope.launch {
+            itemsList?.collect { list ->
+                listCheckedItems = list.filter { it.isCheck }
+            }
+        }
+    }
+
     private fun updateBasket() {
         viewModelScope.launch {
             itemsList?.collect { list ->
@@ -218,6 +254,7 @@ class AddItemViewModel @Inject constructor(
 
     private fun checkBasket() {
         colorBudget = if (basket > currentBudget) Color.Red else Color.Green
+        colorReceipt = if (basket == 0) GrayLight else Color.Green
     }
 
     private fun updateShoppingListCount() {
@@ -241,6 +278,32 @@ class AddItemViewModel @Inject constructor(
     private fun sendUiEvent(event: UiEvent) {
         viewModelScope.launch {
             _uiEvent.send(event)
+        }
+    }
+
+
+    override fun onReceiptDialogEvent(event: ReceiptDialogEvent) {
+        when (event) {
+            ReceiptDialogEvent.OnCancel -> {
+                openReceiptDialog.value = false
+                receipt = ReceiptListItem(null, "", "", 0, emptyList())
+                viewModelScope.launch {
+                    listCheckedItems.forEach {  chItem ->
+                        repository.deleteItem(chItem)
+                    }
+                }
+                sendUiEvent(UiEvent.ShowSnackBar("Ваш чек не был сохранён!"))
+            }
+            ReceiptDialogEvent.OnConfirm -> {
+                openReceiptDialog.value = false
+                viewModelScope.launch {
+                    repository.insertReceipt(receiptItem!!)
+                    listCheckedItems.forEach {  chItem ->
+                        repository.deleteItem(chItem)
+                    }
+                }
+                sendUiEvent(UiEvent.ShowSnackBar("Ваш чек был сохранён!"))
+            }
         }
     }
 
