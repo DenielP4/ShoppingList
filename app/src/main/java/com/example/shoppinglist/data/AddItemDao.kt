@@ -25,4 +25,7 @@ interface AddItemDao {
 
     @Update
     suspend fun insertItem(item: ShoppingListItem)
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insertReceipt(item: ReceiptListItem)
 }

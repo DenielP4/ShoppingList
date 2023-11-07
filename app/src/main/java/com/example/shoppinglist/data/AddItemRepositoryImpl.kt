@@ -24,4 +24,8 @@ class AddItemRepositoryImpl(
     override suspend fun getListItemById(listId: Int): ShoppingListItem {
         return dao.getListItemById(listId)
     }
+
+    override suspend fun insertReceipt(item: ReceiptListItem) {
+        dao.insertReceipt(item)
+    }
 }

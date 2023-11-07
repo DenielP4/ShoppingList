@@ -13,4 +13,5 @@ interface AddItemRepository {
     fun getAllItemsById(listId: Int): Flow<List<AddItem>>
     suspend fun getListItemById(listId: Int): ShoppingListItem
     suspend fun insertItem(item: ShoppingListItem)
+    suspend fun insertReceipt(item: ReceiptListItem)
 }
