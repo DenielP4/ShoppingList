@@ -3,26 +3,22 @@ package com.example.shoppinglist.data
 import androidx.room.AutoMigration
 import androidx.room.Database
 import androidx.room.RoomDatabase
+import androidx.room.TypeConverters
 
 @Database(
     entities = [
         ShoppingListItem::class,
         AddItem::class,
         NoteItem::class,
-//        ReceiptListItem::class
-        // Простая миграция
-//    CheckItem::class
+        ReceiptListItem::class
     ],
-    //    autoMigrations = [AutoMigration(from = 1, to = 2, spec = MainDb.RenameShopList::class)],
     version = 1,
     exportSchema = true
 )
+@TypeConverters(Converters::class)
 abstract class MainDb : RoomDatabase() {
-    // Сложная миграция
-    // RenameTable(fromTableName = "shop_list_name", toTableName = "shop_list")
-    // class renameShopList: AutoMigrationSpec
+    abstract val receiptListDao: ReceiptListDao
     abstract val shoppingListDao: ShoppingListDao
     abstract val noteItemDao: NoteItemDao
     abstract val addItemDao: AddItemDao
-//    abstract val receiptListDao: ReceiptListDao
 }
