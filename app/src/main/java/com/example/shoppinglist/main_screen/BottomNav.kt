@@ -21,8 +21,8 @@ fun BottomNav(
 ) {
     val listItem = listOf(
         BottomNavItem.ListItem,
+        BottomNavItem.Receipt,
         BottomNavItem.NoteItem,
-        BottomNavItem.AboutItem,
         BottomNavItem.SettingsItem
     )
     BottomNavigation(backgroundColor = Color.White) {

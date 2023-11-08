@@ -34,7 +34,7 @@ class MainScreenViewModel @Inject constructor(
         private set
     override var showEditableText = mutableStateOf(true)
         private set
-    override var budgetNumber = mutableStateOf("0")
+    override var budgetNumber = mutableStateOf("")
         private set
     override var showBudgetNumber = mutableStateOf(true)
         private set
@@ -76,7 +76,7 @@ class MainScreenViewModel @Inject constructor(
             }
             is MainScreenEvent.Navigate -> {
                 sendUiEvent(UiEvent.Navigate(event.route))
-                showFloatingButton.value = !(event.route == Routes.ABOUT || event.route == Routes.SETTINGS)
+                showFloatingButton.value = !(event.route == Routes.RECEIPT_LIST || event.route == Routes.SETTINGS)
             }
             is MainScreenEvent.NavigateMain -> {
                 sendUiEvent(UiEvent.NavigateMain(event.route))
@@ -94,7 +94,7 @@ class MainScreenViewModel @Inject constructor(
                 onEvent(MainScreenEvent.OnItemSave)
                 openDialog.value = false
                 editableText.value = ""
-                budgetNumber.value = "0"
+                budgetNumber.value = ""
             }
             is DialogEvent.OnTextChange -> {
                 editableText.value = event.text

@@ -8,6 +8,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.shoppinglist.about_screen.AboutScreen
 import com.example.shoppinglist.note_list_screen.NoteListScreen
+import com.example.shoppinglist.receipt_screen.ReceiptScreen
 import com.example.shoppinglist.settings_screen.SettingsScreen
 import com.example.shoppinglist.shopping_list_screen.ShoppingListScreen
 import com.example.shoppinglist.utils.Routes
@@ -23,6 +24,9 @@ fun NavigationGraph(
             ShoppingListScreen() { route ->
                 onNavigate(route)
             }
+        }
+        composable(Routes.RECEIPT_LIST) {
+            ReceiptScreen()
         }
         composable(Routes.NOTE_LIST) {
             NoteListScreen() { route ->
