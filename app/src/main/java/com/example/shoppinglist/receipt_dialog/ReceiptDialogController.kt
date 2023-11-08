@@ -7,5 +7,7 @@ interface ReceiptDialogController {
     val dialogTitleReceipt: MutableState<String>
     val openReceiptDialog: MutableState<Boolean>
     val receipt: ReceiptListItem
+    val showSaveButton: MutableState<Boolean>
+    val showDontSaveButton: MutableState<Boolean>
     fun onReceiptDialogEvent(event: ReceiptDialogEvent)
 }
