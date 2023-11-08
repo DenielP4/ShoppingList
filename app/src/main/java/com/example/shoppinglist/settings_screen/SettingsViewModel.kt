@@ -40,7 +40,7 @@ class SettingsViewModel @Inject constructor(
 
     fun onEvent(event: SettingsEvent){
         when(event){
-            is SettingsEvent.OnItemselected -> {
+            is SettingsEvent.OnItemSelected -> {
                 viewModelScope.launch {
                     dataStoreManager.saveStringPreference(
                         event.color,

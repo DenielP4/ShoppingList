@@ -31,7 +31,7 @@ fun UiColorItem(
                 )
             ),
         onClick = {
-            onEvent(SettingsEvent.OnItemselected(item.color))
+            onEvent(SettingsEvent.OnItemSelected(item.color))
         }
     ) {
         if (item.isSelected) {
