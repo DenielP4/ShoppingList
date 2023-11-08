@@ -94,7 +94,7 @@ fun MainDialog(
                     Spacer(modifier = Modifier.height(10.dp))
                     if (dialogController.showBudgetNumber.value) {
                         TextField(
-                            value = dialogController.budgetNumber.value.toString(),
+                            value = dialogController.budgetNumber.value,
                             onValueChange = {budget ->
                                 dialogController.onDialogEvent(DialogEvent.OnBudgetChange(budget))
                             },
