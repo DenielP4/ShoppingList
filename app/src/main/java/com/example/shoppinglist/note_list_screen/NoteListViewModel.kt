@@ -89,7 +89,7 @@ class NoteListViewModel @Inject constructor(
             is NoteListEvent.OnItemClick -> {
                 sendUiEvent(UiEvent.Navigate(event.route))
             }
-            is NoteListEvent.UbDoneDeleteItem -> {
+            is NoteListEvent.UnDoneDeleteItem -> {
                 viewModelScope.launch {
                     repository.insertItem(noteItem!!)
                 }

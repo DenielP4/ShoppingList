@@ -60,7 +60,7 @@ fun NoteListScreen(
                         actionLabel = "Отмена"
                     )
                     if (result == SnackbarResult.ActionPerformed) {
-                        viewModel.onEvent(NoteListEvent.UbDoneDeleteItem)
+                        viewModel.onEvent(NoteListEvent.UnDoneDeleteItem)
                     }
                 }
 
