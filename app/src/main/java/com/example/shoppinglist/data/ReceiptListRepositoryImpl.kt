@@ -1,5 +1,7 @@
 package com.example.shoppinglist.data
 
+import kotlinx.coroutines.flow.Flow
+
 class ReceiptListRepositoryImpl(
     private val dao: ReceiptListDao
 ) : ReceiptListRepository {
@@ -10,6 +12,10 @@ class ReceiptListRepositoryImpl(
 
     override suspend fun deleteItem(item: ReceiptListItem) {
         dao.deleteItem(item)
+    }
+
+    override fun getAllItems(): Flow<List<ReceiptListItem>> {
+        return dao.getAllItems()
     }
 
 }
