@@ -1,6 +1,8 @@
 package com.example.shoppinglist.add_item_screen
 
 import android.annotation.SuppressLint
+import android.util.Log
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -40,11 +42,15 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -56,8 +62,10 @@ import com.example.shoppinglist.ui.theme.DarkText
 import com.example.shoppinglist.ui.theme.EmptyText
 import com.example.shoppinglist.ui.theme.GrayLight
 import com.example.shoppinglist.ui.theme.RedLight
+import com.example.shoppinglist.ui.theme.Yellow
 import com.example.shoppinglist.utils.UiEvent
 
+@OptIn(ExperimentalComposeUiApi::class)
 @SuppressLint("UnusedMaterialScaffoldPaddingParameter", "UnrememberedMutableState")
 @Composable
 fun AddItemScreen(
@@ -66,7 +74,11 @@ fun AddItemScreen(
 
     val scaffoldState = rememberScaffoldState()
     val itemsList = viewModel.itemsList?.collectAsState(initial = emptyList())
+    val keyboardController = LocalSoftwareKeyboardController.current
+    val focusManager = LocalFocusManager.current
 
+    val columnName1Weight = 1f
+    val columnName2Weight = 1f
 
     LaunchedEffect(key1 = true) {
         viewModel.uiEvent.collect { uiEvent ->
@@ -212,7 +224,7 @@ fun AddItemScreen(
                         },
                         colors = TextFieldDefaults.textFieldColors(
                             backgroundColor = Color.White,
-                            focusedIndicatorColor = RedLight,
+                            focusedIndicatorColor = Color.Transparent,
                             unfocusedIndicatorColor = Color.Transparent
                         ),
                         textStyle = TextStyle(
@@ -221,21 +233,78 @@ fun AddItemScreen(
                         ),
                         singleLine = true
                     )
-                    Checkbox(
-                        checked = viewModel.isPriority.value,
-                        onCheckedChange = { priority ->
+                    IconButton(
+                        onClick = {
+                            val priority = !viewModel.isPriority.value
                             viewModel.onEvent(AddItemEvent.OnPriorityChange(priority))
                         }
-                    )
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.Star,
+                            contentDescription = "Priority",
+                            tint = if (viewModel.isPriority.value) Yellow else Color.Gray
+                        )
+                    }
                     IconButton(
                         onClick = {
                             viewModel.onEvent(AddItemEvent.OnItemSave)
+                            keyboardController?.hide()
+                            focusManager.clearFocus()
                         }
                     ) {
                         Icon(
                             painter = painterResource(id = R.drawable.add_icon),
                             contentDescription = "Add"
                         )
+                    }
+                }
+            }
+
+            AnimatedVisibility(visible = itemsList?.value?.isEmpty() != true) {
+                LazyColumn(
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    item {
+                        Row(
+                            horizontalArrangement = Arrangement.SpaceBetween
+                        ) {
+                            Text(
+                                text = "Товар",
+                                textAlign = TextAlign.Left,
+                                fontSize = 12.sp,
+                                fontWeight = FontWeight.Bold,
+                                modifier = Modifier
+                                    .weight(columnName1Weight)
+                                    .padding(start = 10.dp)
+                            )
+                            Text(
+                                text = "Шт/Гр",
+                                textAlign = TextAlign.Center,
+                                fontSize = 12.sp,
+                                fontWeight = FontWeight.Bold,
+                                modifier = Modifier
+                                    .weight(columnName2Weight)
+                                    .padding(start = 10.dp)
+                            )
+                            Text(
+                                text = "Цена",
+                                textAlign = TextAlign.Center,
+                                fontSize = 12.sp,
+                                fontWeight = FontWeight.Bold,
+                                modifier = Modifier
+                                    .weight(columnName2Weight)
+                                    .padding(start = 10.dp)
+                            )
+                            Text(
+                                text = "Корзина",
+                                textAlign = TextAlign.Center,
+                                fontSize = 12.sp,
+                                fontWeight = FontWeight.Bold,
+                                modifier = Modifier
+                                    .weight(columnName2Weight)
+                                    .padding(start = 5.dp)
+                            )
+                        }
                     }
                 }
             }

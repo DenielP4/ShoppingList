@@ -69,7 +69,7 @@ class AddItemViewModel @Inject constructor(
     var isPriority = mutableStateOf(false)
         private set
 
-    override var dialogTitle = mutableStateOf("")
+    override var dialogTitle = mutableStateOf("Харктеристика товара")
         private set
     override var editableText = mutableStateOf("")
         private set
@@ -81,11 +81,11 @@ class AddItemViewModel @Inject constructor(
         private set
     override var showBudgetNumber = mutableStateOf(false)
         private set
-    override var countNumber = mutableStateOf("0")
+    override var countNumber = mutableStateOf("")
         private set
     override var showCountNumber = mutableStateOf(true)
         private set
-    override var priceNumber = mutableStateOf("0")
+    override var priceNumber = mutableStateOf("")
         private set
     override var showPriceNumber = mutableStateOf(true)
         private set
@@ -95,6 +95,10 @@ class AddItemViewModel @Inject constructor(
     override var openReceiptDialog = mutableStateOf(false)
         private set
     override var receipt: ReceiptListItem = ReceiptListItem(null, "", "", 0, emptyList())
+        private set
+    override var showSaveButton = mutableStateOf(true)
+        private set
+    override var showDontSaveButton = mutableStateOf(true)
         private set
 
 
@@ -137,8 +141,8 @@ class AddItemViewModel @Inject constructor(
                 addItem = event.item
                 openDialog.value = true
                 editableText.value = event.item.name
-                countNumber.value = event.item.count.toString()
-                priceNumber.value = event.item.price.toString()
+                countNumber.value = if (event.item.count == 0) "" else event.item.count.toString()
+                priceNumber.value = if (event.item.price == 0) "" else event.item.price.toString()
             }
 
             is AddItemEvent.OnTextChange -> {
@@ -156,8 +160,10 @@ class AddItemViewModel @Inject constructor(
                 viewModelScope.launch {
                     if (event.item.price != 0)
                         repository.insertItem(event.item)
-                    else
+                    else{
                         sendUiEvent(UiEvent.ShowSnackBar("Укажите цену и количество товара <${event.item.name}>"))
+                        onEvent(AddItemEvent.OnShowEditDialog(event.item))
+                    }
                 }
                 updateBasket()
                 updateShoppingListCount()
@@ -210,8 +216,8 @@ class AddItemViewModel @Inject constructor(
                     }
                 )
                 editableText.value = ""
-                countNumber.value = "0"
-                priceNumber.value = "0"
+                countNumber.value = ""
+                priceNumber.value = ""
                 onEvent(AddItemEvent.OnItemSave)
             }
 
@@ -303,6 +309,10 @@ class AddItemViewModel @Inject constructor(
                     }
                 }
                 sendUiEvent(UiEvent.ShowSnackBar("Ваш чек был сохранён!"))
+            }
+            ReceiptDialogEvent.OnExit -> {
+                openReceiptDialog.value = false
+                receipt = ReceiptListItem(null, "", "", 0, emptyList())
             }
         }
     }
