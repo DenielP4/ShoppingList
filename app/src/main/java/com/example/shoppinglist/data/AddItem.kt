@@ -12,8 +12,11 @@ data class AddItem(
     val listId: Int,
     val priority: Boolean,
     val count: Int,
+    val gram: Int,
+    val weight: Int,
     val price: Int,
     val sum: Int
 ) {
     fun finalSum(price: Int, count: Int): Int = price*count
+    fun sumOfProductWeight(gram: Int, weight: Int, price: Int) = ((weight.toFloat()/gram.toFloat())*price.toFloat()).toInt()
 }
