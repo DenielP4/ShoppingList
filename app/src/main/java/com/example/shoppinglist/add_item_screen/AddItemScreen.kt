@@ -57,10 +57,12 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.shoppinglist.R
 import com.example.shoppinglist.dialog.MainDialog
+import com.example.shoppinglist.food_dialog.FoodDialog
 import com.example.shoppinglist.receipt_dialog.ReceiptDialog
 import com.example.shoppinglist.ui.theme.DarkText
 import com.example.shoppinglist.ui.theme.EmptyText
 import com.example.shoppinglist.ui.theme.GrayLight
+import com.example.shoppinglist.ui.theme.LightText
 import com.example.shoppinglist.ui.theme.RedLight
 import com.example.shoppinglist.ui.theme.Yellow
 import com.example.shoppinglist.utils.UiEvent
@@ -129,28 +131,29 @@ fun AddItemScreen(
                 ) {
                     Column(
                         modifier = Modifier
-                            .weight(2f)
+                            .weight(2.2f)
                             .padding(5.dp)
                     ) {
                         Row(verticalAlignment = Alignment.CenterVertically) {
                             Icon(
                                 imageVector = Icons.Default.Star,
                                 contentDescription = "Budget",
+                                tint = DarkText,
                                 modifier = Modifier
                                     .weight(0.5f)
-                                    .size(15.dp)
+                                    .size(20.dp)
                             )
                             Text(
                                 text = "Ваш бюджет:",
                                 color = viewModel.colorBudget,
-                                fontSize = 15.sp,
+                                fontSize = 20.sp,
                                 fontWeight = FontWeight.Bold,
-                                modifier = Modifier.weight(2f)
+                                modifier = Modifier.weight(3f)
                             )
                             Text(
                                 text = "${viewModel.currentBudget}",
                                 color = viewModel.colorBudget,
-                                fontSize = 15.sp,
+                                fontSize = 20.sp,
                                 fontWeight = FontWeight.Bold,
                                 modifier = Modifier.weight(1f)
                             )
@@ -159,36 +162,45 @@ fun AddItemScreen(
                             Icon(
                                 imageVector = Icons.Default.ShoppingCart,
                                 contentDescription = "Basket",
+                                tint = DarkText,
                                 modifier = Modifier
                                     .weight(0.5f)
-                                    .size(15.dp)
+                                    .size(20.dp)
                             )
                             Text(
                                 text = "Товар на сумму:",
-                                fontSize = 15.sp,
+                                fontSize = 20.sp,
                                 fontWeight = FontWeight.Bold,
-                                modifier = Modifier.weight(2f)
+                                modifier = Modifier.weight(3f)
                             )
                             Text(
                                 text = "${viewModel.basket}",
-                                fontSize = 15.sp,
+                                fontSize = 20.sp,
                                 fontWeight = FontWeight.Bold,
                                 modifier = Modifier.weight(1f)
                             )
                         }
                     }
-                    Button(
-                        onClick = {
-                            viewModel.onEvent(AddItemEvent.OnGenerateReceipt)
-                        },
-                        colors = ButtonDefaults.buttonColors(backgroundColor = viewModel.colorReceipt),
+                    Box(
                         modifier = Modifier
                             .weight(1f)
-                            .padding(5.dp)
+                            .padding(5.dp),
+                        contentAlignment = Alignment.Center
                     ) {
-                        Text(
-                            text = "Ваш чек!"
-                        )
+                        Button(
+                            onClick = {
+                                viewModel.onEvent(AddItemEvent.OnGenerateReceipt)
+                            },
+                            colors = ButtonDefaults.buttonColors(backgroundColor = viewModel.colorReceipt),
+
+                            ) {
+                            Text(
+                                text = "Ваш чек!",
+                                fontSize = 17.sp,
+                                fontWeight = FontWeight.Bold,
+                                color = DarkText
+                            )
+                        }
                     }
                 }
             }
@@ -262,7 +274,9 @@ fun AddItemScreen(
 
             AnimatedVisibility(visible = itemsList?.value?.isEmpty() != true) {
                 LazyColumn(
-                    modifier = Modifier.fillMaxWidth()
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(vertical = 5.dp)
                 ) {
                     item {
                         Row(
@@ -271,7 +285,7 @@ fun AddItemScreen(
                             Text(
                                 text = "Товар",
                                 textAlign = TextAlign.Left,
-                                fontSize = 12.sp,
+                                fontSize = 17.sp,
                                 fontWeight = FontWeight.Bold,
                                 modifier = Modifier
                                     .weight(columnName1Weight)
@@ -280,7 +294,7 @@ fun AddItemScreen(
                             Text(
                                 text = "Шт/Гр",
                                 textAlign = TextAlign.Center,
-                                fontSize = 12.sp,
+                                fontSize = 17.sp,
                                 fontWeight = FontWeight.Bold,
                                 modifier = Modifier
                                     .weight(columnName2Weight)
@@ -289,7 +303,7 @@ fun AddItemScreen(
                             Text(
                                 text = "Цена",
                                 textAlign = TextAlign.Center,
-                                fontSize = 12.sp,
+                                fontSize = 17.sp,
                                 fontWeight = FontWeight.Bold,
                                 modifier = Modifier
                                     .weight(columnName2Weight)
@@ -298,7 +312,7 @@ fun AddItemScreen(
                             Text(
                                 text = "Корзина",
                                 textAlign = TextAlign.Center,
-                                fontSize = 12.sp,
+                                fontSize = 17.sp,
                                 fontWeight = FontWeight.Bold,
                                 modifier = Modifier
                                     .weight(columnName2Weight)
@@ -331,6 +345,7 @@ fun AddItemScreen(
         }
         MainDialog(viewModel)
         ReceiptDialog(viewModel)
+        FoodDialog(viewModel)
         if (itemsList?.value?.isEmpty() == true) {
             Text(
                 modifier = Modifier
