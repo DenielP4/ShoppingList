@@ -59,7 +59,7 @@ fun ReceiptScreen(
                 Snackbar(
                     snackbarData = data,
                     backgroundColor = RedLight,
-                    modifier = Modifier.padding(bottom = 100.dp)
+                    modifier = Modifier.padding(bottom = 50.dp)
                 )
             }
         }

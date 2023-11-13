@@ -16,10 +16,14 @@ import com.example.shoppinglist.data.ReceiptListItem
 import com.example.shoppinglist.data.ShoppingListItem
 import com.example.shoppinglist.dialog.DialogController
 import com.example.shoppinglist.dialog.DialogEvent
+import com.example.shoppinglist.food_dialog.FoodDialogController
+import com.example.shoppinglist.food_dialog.FoodDialogEvent
 import com.example.shoppinglist.main_screen.MainScreenEvent
 import com.example.shoppinglist.receipt_dialog.ReceiptDialogController
 import com.example.shoppinglist.receipt_dialog.ReceiptDialogEvent
+import com.example.shoppinglist.ui.theme.DarkText
 import com.example.shoppinglist.ui.theme.GrayLight
+import com.example.shoppinglist.ui.theme.LightText
 import com.example.shoppinglist.utils.UiEvent
 import com.example.shoppinglist.utils.getCurrentTime
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -34,7 +38,7 @@ import javax.inject.Inject
 class AddItemViewModel @Inject constructor(
     private val repository: AddItemRepository,
     savedStateHandle: SavedStateHandle
-) : ViewModel(), DialogController, ReceiptDialogController {
+) : ViewModel(), DialogController, ReceiptDialogController, FoodDialogController {
 
     private val _uiEvent = Channel<UiEvent>()
     val uiEvent = _uiEvent.receiveAsFlow()
@@ -50,7 +54,11 @@ class AddItemViewModel @Inject constructor(
     var listCheckedItems by mutableStateOf(emptyList<AddItem>())
     var colorBudget by mutableStateOf(Color.Green)
     var colorReceipt by mutableStateOf(GrayLight)
+    var colorReceiptText by mutableStateOf(DarkText)
     var listId: Int = -1
+
+    var weightCheck by mutableStateOf(false)
+        private set
 
     init {
         listId = savedStateHandle.get<String>("listId")?.toInt()!!
@@ -75,19 +83,39 @@ class AddItemViewModel @Inject constructor(
         private set
     override var openDialog = mutableStateOf(false)
         private set
-    override var showEditableText = mutableStateOf(true)
+    override var showEditableText = mutableStateOf(false)
         private set
-    override var budgetNumber = mutableStateOf("0")
+    override var budgetNumber = mutableStateOf("")
         private set
     override var showBudgetNumber = mutableStateOf(false)
         private set
+    override var foodCheckBox = mutableStateOf(false)
+        private set
+    override var showFoodCheckBox = mutableStateOf(false)
+        private set
     override var countNumber = mutableStateOf("")
         private set
-    override var showCountNumber = mutableStateOf(true)
+    override var showCountNumber = mutableStateOf(false)
         private set
     override var priceNumber = mutableStateOf("")
         private set
-    override var showPriceNumber = mutableStateOf(true)
+    override var showPriceNumber = mutableStateOf(false)
+        private set
+    override var gramNumber = mutableStateOf("")
+        private set
+    override var showGramNumber = mutableStateOf(false)
+        private set
+    override var gramWeight = mutableStateOf(false)
+        private set
+    override var showGramRadioBox = mutableStateOf(false)
+        private set
+    override var kiloWeight = mutableStateOf(false)
+        private set
+    override var showKiloRadioBox = mutableStateOf(false)
+        private set
+    override var weightNumber = mutableStateOf("")
+        private set
+    override var showWeightNumber = mutableStateOf(false)
         private set
 
     override var dialogTitleReceipt = mutableStateOf("")
@@ -99,6 +127,16 @@ class AddItemViewModel @Inject constructor(
     override var showSaveButton = mutableStateOf(true)
         private set
     override var showDontSaveButton = mutableStateOf(true)
+        private set
+
+
+    override var dialogTitleFood = mutableStateOf("Какой товар?")
+        private set
+    override var openFoodDialog = mutableStateOf(false)
+        private set
+    override var showProductCount = mutableStateOf(true)
+        private set
+    override var showProductWeight = mutableStateOf(true)
         private set
 
 
@@ -126,12 +164,18 @@ class AddItemViewModel @Inject constructor(
                             listId,
                             addItem?.priority ?: isPriority.value,
                             addItem?.count ?: 0,
+                            addItem?.gram ?: 0,
+                            addItem?.weight ?:0,
                             addItem?.price ?: 0,
-                            addItem?.finalSum(addItem?.price ?: 0, addItem?.count ?: 0) ?: 0
+                            if (weightCheck)
+                                addItem?.sumOfProductWeight(addItem?.gram ?: 0, addItem?.weight ?: 0, addItem?.price ?: 0) ?: 0
+                            else
+                                addItem?.finalSum(addItem?.price ?: 0, addItem?.count ?: 0) ?: 0
                         )
                     )
                 }
                 itemText.value = ""
+                weightCheck = false
                 isPriority.value = false
                 addItem = null
                 updateShoppingListCount()
@@ -139,10 +183,50 @@ class AddItemViewModel @Inject constructor(
 
             is AddItemEvent.OnShowEditDialog -> {
                 addItem = event.item
-                openDialog.value = true
-                editableText.value = event.item.name
-                countNumber.value = if (event.item.count == 0) "" else event.item.count.toString()
-                priceNumber.value = if (event.item.price == 0) "" else event.item.price.toString()
+                if (shoppingListItem!!.food) {
+                    if (addItem!!.sum > 0){
+                        if (addItem!!.weight > 0){
+                            openDialog.value = true
+                            dialogTitle.value = "Весовой товар"
+                            weightCheck = true
+                            editableText.value = event.item.name
+                            showEditableText.value = true
+                            priceNumber.value = if (event.item.price == 0) "" else event.item.price.toString()
+                            showPriceNumber.value = true
+                            gramNumber.value = if (event.item.gram == 0) "" else event.item.gram.toString()
+                            showGramNumber.value = true
+                            weightNumber.value = if (event.item.weight == 0) "" else event.item.weight.toString()
+                            showWeightNumber.value = true
+                            showWeightNumber.value = true
+                            gramWeight.value = true
+                            showGramRadioBox.value = true
+                            kiloWeight.value = false
+                            showKiloRadioBox.value = true
+                        } else {
+                            openDialog.value = true
+                            dialogTitle.value = "Штучный товар"
+                            weightCheck = false
+                            editableText.value = event.item.name
+                            showEditableText.value = true
+                            countNumber.value = if (event.item.count == 0) "" else event.item.count.toString()
+                            showCountNumber.value = true
+                            priceNumber.value = if (event.item.price == 0) "" else event.item.price.toString()
+                            showPriceNumber.value = true
+                        }
+                    } else {
+                        openFoodDialog.value = true
+                    }
+                } else {
+                    openDialog.value = true
+                    dialogTitle.value = "Штучный товар"
+                    weightCheck = false
+                    editableText.value = event.item.name
+                    showEditableText.value = true
+                    countNumber.value = if (event.item.count == 0) "" else event.item.count.toString()
+                    showCountNumber.value = true
+                    priceNumber.value = if (event.item.price == 0) "" else event.item.price.toString()
+                    showPriceNumber.value = true
+                }
             }
 
             is AddItemEvent.OnTextChange -> {
@@ -161,7 +245,6 @@ class AddItemViewModel @Inject constructor(
                     if (event.item.price != 0)
                         repository.insertItem(event.item)
                     else{
-                        sendUiEvent(UiEvent.ShowSnackBar("Укажите цену и количество товара <${event.item.name}>"))
                         onEvent(AddItemEvent.OnShowEditDialog(event.item))
                     }
                 }
@@ -198,26 +281,42 @@ class AddItemViewModel @Inject constructor(
     override fun onDialogEvent(event: DialogEvent) {
         when (event) {
             is DialogEvent.OnCancel -> {
-                openDialog.value = false
-                editableText.value = ""
+                clearAllInput()
             }
 
             is DialogEvent.OnConfirm -> {
-                openDialog.value = false
-                addItem = addItem?.copy(
-                    name = editableText.value,
-                    count = if (countNumber.value.toIntOrNull() != null) countNumber.value.toInt() else {
-                        sendUiEvent(UiEvent.ShowSnackBar("В поле <Количетсво> можно писать только числа!"))
-                        return
-                    },
-                    price = if (priceNumber.value.toIntOrNull() != null) priceNumber.value.toInt() else {
-                        sendUiEvent(UiEvent.ShowSnackBar("В поле <Цена> можно писать только числа!"))
+                if (weightCheck){
+                    val price = priceNumber.value
+                    val gram = gramNumber.value
+                    val weight = weightNumber.value
+                    if (gram.toIntOrNull() == null || price.toIntOrNull() == null || weight.toIntOrNull() == null){
+                        sendUiEvent(UiEvent.ShowSnackBar("В числовые поля можно писать только числа!"))
+                        clearAllInput()
                         return
                     }
-                )
-                editableText.value = ""
-                countNumber.value = ""
-                priceNumber.value = ""
+                    addItem = addItem?.copy(
+                        name = editableText.value,
+                        price = price.toInt(),
+                        gram = if (kiloWeight.value) gram.toInt()*1000 else gram.toInt(),
+                        weight = weight.toInt()
+                    )
+                    clearAllInput()
+
+                } else {
+                    val count = countNumber.value
+                    val price = priceNumber.value
+                    if (count.toIntOrNull() == null || price.toIntOrNull() == null){
+                        sendUiEvent(UiEvent.ShowSnackBar("В числовые поля можно писать только числа!"))
+                        clearAllInput()
+                        return
+                    }
+                    addItem = addItem?.copy(
+                        name = editableText.value,
+                        count = count.toInt(),
+                        price = price.toInt()
+                    )
+                    clearAllInput()
+                }
                 onEvent(AddItemEvent.OnItemSave)
             }
 
@@ -233,8 +332,49 @@ class AddItemViewModel @Inject constructor(
                 countNumber.value = event.count
             }
 
+            is DialogEvent.OnGramChange -> {
+                gramNumber.value = event.gram
+            }
+
+            is DialogEvent.OnGramRadioBoxChange -> {
+                if (gramWeight.value) gramWeight.value = true
+                else {
+                    gramWeight.value = true
+                    kiloWeight.value = false
+                }
+            }
+
+            is DialogEvent.OnKiloRadioBoxChange -> {
+                if (kiloWeight.value) kiloWeight.value = true
+                else {
+                    kiloWeight.value = true
+                    gramWeight.value = false
+                }
+            }
+
+            is DialogEvent.OnWeightChange -> {
+                weightNumber.value = event.weight
+            }
             else -> {}
         }
+    }
+
+    private fun clearAllInput() {
+        openDialog.value = false
+        editableText.value = ""
+        countNumber.value = ""
+        priceNumber.value = ""
+        showEditableText.value = false
+        showCountNumber.value = false
+        showPriceNumber.value = false
+        gramNumber.value = ""
+        showGramNumber.value = false
+        weightNumber.value = ""
+        showWeightNumber.value = false
+        gramWeight.value = false
+        showGramRadioBox.value = false
+        kiloWeight.value = false
+        showKiloRadioBox.value = false
     }
 
     private fun updateListChekedItem() {
@@ -298,6 +438,7 @@ class AddItemViewModel @Inject constructor(
                         repository.deleteItem(chItem)
                     }
                 }
+                updateShoppingListCount()
                 sendUiEvent(UiEvent.ShowSnackBar("Ваш чек не был сохранён!"))
             }
             ReceiptDialogEvent.OnConfirm -> {
@@ -308,11 +449,53 @@ class AddItemViewModel @Inject constructor(
                         repository.deleteItem(chItem)
                     }
                 }
+                updateShoppingListCount()
                 sendUiEvent(UiEvent.ShowSnackBar("Ваш чек был сохранён!"))
             }
             ReceiptDialogEvent.OnExit -> {
                 openReceiptDialog.value = false
                 receipt = ReceiptListItem(null, "", "", 0, emptyList())
+            }
+        }
+    }
+
+    override fun onFoodDialogEvent(event: FoodDialogEvent) {
+        when(event){
+            FoodDialogEvent.OnCancel -> {
+                openFoodDialog.value = false
+            }
+            FoodDialogEvent.OnExit -> {
+                openFoodDialog.value = false
+            }
+            FoodDialogEvent.OnProductCount -> {
+                weightCheck = false
+                openFoodDialog.value = false
+                openDialog.value = true
+                dialogTitle.value = "Штучный товар"
+                editableText.value = addItem!!.name
+                showEditableText.value = true
+                countNumber.value = ""
+                showCountNumber.value = true
+                priceNumber.value = ""
+                showPriceNumber.value = true
+            }
+            FoodDialogEvent.OnProductWeight -> {
+                weightCheck = true
+                openFoodDialog.value = false
+                openDialog.value = true
+                dialogTitle.value = "Весовой товар"
+                editableText.value = addItem!!.name
+                showEditableText.value = true
+                priceNumber.value = ""
+                showPriceNumber.value = true
+                gramNumber.value = ""
+                showGramNumber.value = true
+                weightNumber.value = ""
+                showWeightNumber.value = true
+                gramWeight.value = true
+                showGramRadioBox.value = true
+                kiloWeight.value = false
+                showKiloRadioBox.value = true
             }
         }
     }

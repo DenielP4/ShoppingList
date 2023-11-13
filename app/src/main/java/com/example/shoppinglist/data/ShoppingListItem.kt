@@ -11,5 +11,6 @@ data class ShoppingListItem(
     val time: String,
     val allItemsCount: Int,
     val selectedItemsCount: Int,
-    val budget: Int
+    val budget: Int,
+    val food: Boolean
 )

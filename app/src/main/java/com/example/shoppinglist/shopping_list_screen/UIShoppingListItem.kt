@@ -3,9 +3,12 @@ package com.example.shoppinglist.shopping_list_screen
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Card
@@ -13,8 +16,11 @@ import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
 import androidx.compose.material.LinearProgressIndicator
 import androidx.compose.material.Text
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.DateRange
 
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
@@ -31,6 +37,7 @@ import com.example.shoppinglist.settings_screen.ColorUtils
 import com.example.shoppinglist.ui.theme.DarkText
 import com.example.shoppinglist.ui.theme.DeleteColor
 import com.example.shoppinglist.ui.theme.EditColor
+import com.example.shoppinglist.ui.theme.GrayLight
 import com.example.shoppinglist.ui.theme.LightText
 import com.example.shoppinglist.ui.theme.RedLight
 import com.example.shoppinglist.utils.ProgressHelper
@@ -71,21 +78,47 @@ fun UiShoppingListItem(
                     .fillMaxWidth()
                     .padding(8.dp)
             ) {
-                Text(
-                    text = item.name,
-                    style = TextStyle(
-                        color = DarkText,
-                        fontWeight = FontWeight.Bold,
-                        fontSize = 16.sp
+                Row(
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(
+                        text = item.name,
+                        style = TextStyle(
+                            color = DarkText,
+                            fontWeight = FontWeight.Bold,
+                            fontSize = 20.sp
+                        )
                     )
-                )
-                Text(
-                    text = item.time,
-                    style = TextStyle(
-                        color = LightText,
-                        fontSize = 12.sp
+                    Spacer(modifier = Modifier.width(5.dp))
+                    if (item.food) {
+                        Icon(
+                            modifier = Modifier
+                                .size(25.dp),
+                            painter = painterResource(id = R.drawable.shopping_basket_icon),
+                            contentDescription = "Корзина",
+                            tint = LightText
+                        )
+                    }
+                }
+                Row(
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Icon(
+                        modifier = Modifier
+                            .size(20.dp),
+                        imageVector = Icons.Default.DateRange,
+                        contentDescription = "Календарь",
+                        tint = Color.Gray
                     )
-                )
+                    Spacer(modifier = Modifier.width(5.dp))
+                    Text(
+                        text = item.time,
+                        style = TextStyle(
+                            color = LightText,
+                            fontSize = 15.sp
+                        )
+                    )
+                }
                 LinearProgressIndicator(
                     modifier = Modifier
                         .fillMaxWidth()

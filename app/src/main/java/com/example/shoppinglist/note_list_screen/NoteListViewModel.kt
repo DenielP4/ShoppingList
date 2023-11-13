@@ -10,6 +10,7 @@ import com.example.shoppinglist.add_item_screen.AddItemEvent
 import com.example.shoppinglist.data.NoteItem
 import com.example.shoppinglist.data.NoteItemRepository
 import com.example.shoppinglist.datastore.DataStoreManager
+import com.example.shoppinglist.datastore.SettingsData
 import com.example.shoppinglist.dialog.DialogController
 import com.example.shoppinglist.dialog.DialogEvent
 import com.example.shoppinglist.utils.Routes
@@ -53,6 +54,10 @@ class NoteListViewModel @Inject constructor(
         private set
     override var showBudgetNumber = mutableStateOf(false)
         private set
+    override var foodCheckBox = mutableStateOf(false)
+        private set
+    override var showFoodCheckBox = mutableStateOf(false)
+        private set
     override var countNumber = mutableStateOf("0")
         private set
     override var showCountNumber = mutableStateOf(false)
@@ -60,6 +65,22 @@ class NoteListViewModel @Inject constructor(
     override var priceNumber = mutableStateOf("0")
         private set
     override var showPriceNumber = mutableStateOf(false)
+        private set
+    override var gramNumber = mutableStateOf("")
+        private set
+    override var showGramNumber = mutableStateOf(false)
+        private set
+    override var gramWeight = mutableStateOf(false)
+        private set
+    override var showGramRadioBox = mutableStateOf(false)
+        private set
+    override var kiloWeight = mutableStateOf(false)
+        private set
+    override var showKiloRadioBox = mutableStateOf(false)
+        private set
+    override var weightNumber = mutableStateOf("")
+        private set
+    override var showWeightNumber = mutableStateOf(false)
         private set
 
     init {

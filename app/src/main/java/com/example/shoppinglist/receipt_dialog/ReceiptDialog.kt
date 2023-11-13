@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -45,7 +46,6 @@ import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.constraintlayout.compose.ConstraintLayout
-import com.example.shoppinglist.R
 import com.example.shoppinglist.shopping_list_screen.ShoppingListEvent
 import com.example.shoppinglist.ui.theme.DarkText
 import com.example.shoppinglist.ui.theme.DeleteColor
@@ -72,11 +72,7 @@ fun ReceiptDialog(
             },
             title = null,
             text = {
-                ConstraintLayout(
-                    modifier = Modifier.padding(
-                        start = 3.dp, top = 18.dp, end = 3.dp
-                    )
-                ) {
+                ConstraintLayout() {
                     val (dialog, exit) = createRefs()
                     Column(
                         modifier = Modifier
@@ -93,22 +89,19 @@ fun ReceiptDialog(
                             style = TextStyle(
                                 color = DarkText,
                                 fontWeight = FontWeight.Bold,
-                                fontSize = 20.sp
+                                fontSize = 25.sp
                             ),
                             modifier = Modifier.fillMaxWidth()
                         )
-                        Spacer(modifier = Modifier.height(10.dp))
                         LazyColumn(
-                            Modifier
-                                .fillMaxWidth()
-                                .padding(2.dp)
+                            modifier = Modifier.fillMaxWidth()
                         ) {
                             item {
                                 Row(horizontalArrangement = Arrangement.SpaceBetween) {
                                     Text(
-                                        text = "НАИМЕНОВАНИЕ",
+                                        text = "ТОВАР",
                                         textAlign = TextAlign.Center,
-                                        fontSize = 12.sp,
+                                        fontSize = 17.sp,
                                         fontWeight = FontWeight.Bold,
                                         modifier = Modifier
                                             .weight(columnName1Weight)
@@ -117,7 +110,7 @@ fun ReceiptDialog(
                                     Text(
                                         text = "СТОИМОСТЬ",
                                         textAlign = TextAlign.Center,
-                                        fontSize = 12.sp,
+                                        fontSize = 17.sp,
                                         fontWeight = FontWeight.Bold,
                                         modifier = Modifier
                                             .weight(columnName2Weight)
@@ -138,15 +131,15 @@ fun ReceiptDialog(
                             Modifier
                                 .fillMaxWidth()
                                 .padding(
-                                    start = 16.dp,
-                                    end = 16.dp
+                                    start = 2.dp,
+                                    end = 2.dp
                                 )
                         ) {
                             items(dialogController.receipt.listItem!!) { item ->
                                 Row() {
                                     Text(
                                         text = item.name,
-                                        fontSize = 10.sp,
+                                        fontSize = 15.sp,
                                         fontWeight = FontWeight.Normal,
                                         modifier = Modifier
                                             .weight(column1Weight)
@@ -156,16 +149,26 @@ fun ReceiptDialog(
                                         horizontalArrangement = Arrangement.SpaceAround,
                                         modifier = Modifier.weight(column1Weight)
                                     ) {
-                                        Text(
-                                            text = "${item.price} * ${item.count}",
-                                            fontSize = 10.sp,
-                                            fontWeight = FontWeight.Normal,
-                                            modifier = Modifier
-                                                .padding(8.dp)
-                                        )
+                                        if (item.weight>0){
+                                            Text(
+                                                text = "${item.weight}гр",
+                                                fontSize = 15.sp,
+                                                fontWeight = FontWeight.Normal,
+                                                modifier = Modifier
+                                                    .padding(8.dp)
+                                            )
+                                        } else {
+                                            Text(
+                                                text = "${item.price} * ${item.count}",
+                                                fontSize = 15.sp,
+                                                fontWeight = FontWeight.Normal,
+                                                modifier = Modifier
+                                                    .padding(8.dp)
+                                            )
+                                        }
                                         Text(
                                             text = "= ${item.sum}",
-                                            fontSize = 10.sp,
+                                            fontSize = 15.sp,
                                             fontWeight = FontWeight.Normal,
                                             modifier = Modifier
                                                 .padding(8.dp)
@@ -189,7 +192,7 @@ fun ReceiptDialog(
                             Text(
                                 text = "ИТОГО К ОПЛАТЕ = ${dialogController.receipt.finalSum}",
                                 textAlign = TextAlign.Right,
-                                fontSize = 14.sp,
+                                fontSize = 17.sp,
                                 fontWeight = FontWeight.Bold,
                                 modifier = Modifier
                                     .padding(8.dp)

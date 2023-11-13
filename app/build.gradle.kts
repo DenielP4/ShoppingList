@@ -18,11 +18,11 @@ android {
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         // Простая миграция
-        kapt{
-            arguments {
-                arg("room.schemaLocation", "$projectDir")
-            }
-        }
+//        kapt{
+//            arguments {
+//                arg("room.schemaLocation", "$projectDir")
+//            }
+//        }
         vectorDrawables {
             useSupportLibrary = true
         }

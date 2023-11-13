@@ -4,6 +4,7 @@ import android.content.Context
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.edit
+import androidx.datastore.preferences.core.longPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
 import kotlinx.coroutines.flow.map
@@ -27,4 +28,24 @@ class DataStoreManager(
     companion object {
         const val TITLE_COLOR = "title_color"
     }
+
+    suspend fun saveSettings(settingsData: SettingsData){
+        context.datastore.edit { pref ->
+            pref[longPreferencesKey("action_button_color")] = settingsData.actionButtonColor
+            pref[longPreferencesKey("background_color")] = settingsData.backroundColor
+            pref[longPreferencesKey("bottom_bar_color")] = settingsData.bottomBarColor
+            pref[longPreferencesKey("bottom_bar_icons_color")] = settingsData.bottomBarIconsColor
+        }
+    }
+
+   fun getSettings(defSettings: SettingsData) = context.datastore.data.map { pref ->
+       return@map SettingsData(
+           pref[longPreferencesKey("action_button_color")] ?: defSettings.actionButtonColor,
+           pref[longPreferencesKey("background_color")] ?: defSettings.backroundColor,
+           pref[longPreferencesKey("bottom_bar_color")] ?: defSettings.bottomBarColor,
+           pref[longPreferencesKey("bottom_bar_icons_color")] ?: defSettings.bottomBarIconsColor
+       )
+   }
+
+
 }

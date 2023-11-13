@@ -62,23 +62,35 @@ fun UiAddItem(
                     .weight(1f)
                     .padding(start = 10.dp),
                 text = item.name,
-                fontSize = 12.sp,
+                fontSize = 15.sp,
                 textAlign = TextAlign.Left
             )
-            Text(
-                modifier = Modifier
-                    .weight(1f)
-                    .padding(start = 10.dp),
-                text = if (item.sum>0) item.count.toString() else "",
-                fontSize = 12.sp,
-                textAlign = TextAlign.Center
-            )
+            if (item.weight>0){
+                Text(
+                    modifier = Modifier
+                        .weight(1f)
+                        .padding(start = 10.dp),
+                    text = if (item.gram>0) item.gram.toString() else "",
+                    fontSize = 15.sp,
+                    textAlign = TextAlign.Center
+                )
+            } else {
+                Text(
+                    modifier = Modifier
+                        .weight(1f)
+                        .padding(start = 10.dp),
+                    text = if (item.sum>0) item.count.toString() else "",
+                    fontSize = 15.sp,
+                    textAlign = TextAlign.Center
+                )
+            }
+
             Text(
                 modifier = Modifier
                     .weight(1f)
                     .padding(start = 10.dp),
                 text = if (item.sum>0) item.price.toString() else "",
-                fontSize = 12.sp,
+                fontSize = 15.sp,
                 textAlign = TextAlign.Center
             )
             Box(

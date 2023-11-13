@@ -12,8 +12,7 @@ import androidx.room.TypeConverters
         NoteItem::class,
         ReceiptListItem::class
     ],
-    version = 1,
-    exportSchema = true
+    version = 1
 )
 @TypeConverters(Converters::class)
 abstract class MainDb : RoomDatabase() {

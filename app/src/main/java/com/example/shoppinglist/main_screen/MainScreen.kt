@@ -1,12 +1,17 @@
 package com.example.shoppinglist.main_screen
 
 import android.annotation.SuppressLint
+import android.util.Log
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.FabPosition
 import androidx.compose.material.FloatingActionButton
 import androidx.compose.material.Icon
 import androidx.compose.material.Scaffold
+import androidx.compose.material.Snackbar
+import androidx.compose.material.SnackbarHost
+import androidx.compose.material.rememberScaffoldState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -14,6 +19,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
@@ -35,6 +41,10 @@ fun MainScreen(
     val navController = rememberNavController()
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute = navBackStackEntry?.destination?.route
+    val scaffoldState = rememberScaffoldState()
+
+    val actionButtonColor = Color(viewModel.actionButtonColor.value)
+    val bottomBarIconsColor = Color(viewModel.actionButtonColor.value)
 
     LaunchedEffect(key1 = true) {
         viewModel.uiEvent.collect { uiEvent ->
@@ -47,14 +57,28 @@ fun MainScreen(
                     navController.navigate(uiEvent.route)
                 }
 
+                is UiEvent.ShowSnackBar -> {
+                    scaffoldState.snackbarHostState.showSnackbar(
+                        uiEvent.message
+                    )
+                }
                 else -> {}
             }
         }
     }
 
     Scaffold(
+        scaffoldState = scaffoldState,
+        snackbarHost = {
+            SnackbarHost(hostState = scaffoldState.snackbarHostState) { data ->
+                Snackbar(
+                    snackbarData = data,
+                    backgroundColor = RedLight
+                )
+            }
+        },
         bottomBar = {
-            BottomNav(currentRoute) { route ->
+            BottomNav(currentRoute, bottomBarIconsColor) { route ->
                 viewModel.onEvent(MainScreenEvent.Navigate(route))
             }
         },
@@ -65,7 +89,7 @@ fun MainScreen(
                         viewModel.onEvent(MainScreenEvent.OnNewItemClick(currentRoute ?: Routes.SHOPPING_LIST))
                     },
                     shape = CircleShape,
-                    backgroundColor = RedLight
+                    backgroundColor = actionButtonColor
                 ) {
                     Icon(
                         painter = painterResource(id = R.drawable.add_icon),

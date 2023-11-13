@@ -39,6 +39,10 @@ class ShoppingListViewModel @Inject constructor(
         private set
     override var showBudgetNumber = mutableStateOf(false)
         private set
+    override var foodCheckBox = mutableStateOf(false)
+        private set
+    override var showFoodCheckBox = mutableStateOf(true)
+        private set
     override var countNumber = mutableStateOf("0")
         private set
     override var showCountNumber = mutableStateOf(false)
@@ -47,11 +51,31 @@ class ShoppingListViewModel @Inject constructor(
         private set
     override var showPriceNumber = mutableStateOf(false)
         private set
+    override var gramNumber = mutableStateOf("")
+        private set
+    override var showGramNumber = mutableStateOf(false)
+        private set
+    override var gramWeight = mutableStateOf(false)
+        private set
+    override var showGramRadioBox = mutableStateOf(false)
+        private set
+    override var kiloWeight = mutableStateOf(false)
+        private set
+    override var showKiloRadioBox = mutableStateOf(false)
+        private set
+    override var weightNumber = mutableStateOf("")
+        private set
+    override var showWeightNumber = mutableStateOf(false)
+        private set
 
     fun onEvent(event: ShoppingListEvent){
         when(event){
             is ShoppingListEvent.OnItemSave -> {
                 if (editableText.value.isEmpty() || budgetNumber.value.isEmpty() || budgetNumber.value == "0") return
+                if (budgetNumber.value.toIntOrNull() == null) {
+                    sendUiEvent(UiEvent.ShowSnackBar("В поле <Бюджет> можно писать только числа"))
+                    return
+                }
                 viewModelScope.launch {
                     repository.insertItem(
                         ShoppingListItem(
@@ -60,7 +84,8 @@ class ShoppingListViewModel @Inject constructor(
                             listItem?.time ?: getCurrentTime(),
                             listItem?.allItemsCount ?: 0,
                             listItem?.selectedItemsCount ?: 0,
-                            budgetNumber.value.toInt()
+                            budgetNumber.value.toInt(),
+                            foodCheckBox.value
                         )
                     )
                 }
@@ -73,9 +98,11 @@ class ShoppingListViewModel @Inject constructor(
                 openDialog.value = true
                 editableText.value = listItem?.name ?: ""
                 budgetNumber.value = listItem?.budget.toString() ?: ""
+                foodCheckBox.value = listItem?.food ?: false
                 dialogTitle.value = "Название списка"
                 showEditableText.value = true
                 showBudgetNumber.value = true
+                showFoodCheckBox.value = true
             }
             is ShoppingListEvent.OnShowDeleteDialog -> {
                 listItem = event.item
@@ -83,6 +110,7 @@ class ShoppingListViewModel @Inject constructor(
                 dialogTitle.value = "Удалить список"
                 showEditableText.value = false
                 showBudgetNumber.value = false
+                showFoodCheckBox.value = false
             }
         }
     }
@@ -107,6 +135,9 @@ class ShoppingListViewModel @Inject constructor(
             }
             is DialogEvent.OnBudgetChange -> {
                 budgetNumber.value = event.budget
+            }
+            is DialogEvent.OnCheckedChange -> {
+                foodCheckBox.value = event.food
             }
             else -> {}
         }

@@ -1,14 +1,19 @@
 package com.example.shoppinglist.main_screen
 
+import android.util.Log
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.shoppinglist.data.ShoppingListItem
 import com.example.shoppinglist.data.ShoppingListRepository
+import com.example.shoppinglist.datastore.DataStoreManager
+import com.example.shoppinglist.datastore.SettingsData
 import com.example.shoppinglist.dialog.DialogController
 import com.example.shoppinglist.dialog.DialogEvent
 import com.example.shoppinglist.shopping_list_screen.ShoppingListEvent
+import com.example.shoppinglist.ui.theme.RedLight
+import com.example.shoppinglist.ui.theme.White
 import com.example.shoppinglist.utils.Routes
 import com.example.shoppinglist.utils.UiEvent
 import com.example.shoppinglist.utils.getCurrentTime
@@ -20,11 +25,15 @@ import javax.inject.Inject
 
 @HiltViewModel
 class MainScreenViewModel @Inject constructor(
-    private val repository: ShoppingListRepository
-) : ViewModel(), DialogController {
+    private val repository: ShoppingListRepository,
+    dataStoreManager: DataStoreManager
+) : ViewModel(), DialogController{
 
     private val _uiEvent = Channel<UiEvent>()
     val uiEvent = _uiEvent.receiveAsFlow()
+
+    var actionButtonColor = mutableStateOf(RedLight.value)
+    var bottomBarIconsColor = mutableStateOf(RedLight.value)
 
     override var dialogTitle = mutableStateOf("Название списка")
         private set
@@ -38,6 +47,10 @@ class MainScreenViewModel @Inject constructor(
         private set
     override var showBudgetNumber = mutableStateOf(true)
         private set
+    override var foodCheckBox = mutableStateOf(false)
+        private set
+    override var showFoodCheckBox = mutableStateOf(true)
+        private set
     override var countNumber = mutableStateOf("0")
         private set
     override var showCountNumber = mutableStateOf(false)
@@ -46,14 +59,50 @@ class MainScreenViewModel @Inject constructor(
         private set
     override var showPriceNumber = mutableStateOf(false)
         private set
+    override var gramNumber = mutableStateOf("")
+        private set
+    override var showGramNumber = mutableStateOf(false)
+        private set
+    override var gramWeight = mutableStateOf(false)
+        private set
+    override var showGramRadioBox = mutableStateOf(false)
+        private set
+    override var kiloWeight = mutableStateOf(false)
+        private set
+    override var showKiloRadioBox = mutableStateOf(false)
+        private set
+    override var weightNumber = mutableStateOf("")
+        private set
+    override var showWeightNumber = mutableStateOf(false)
+        private set
 
     var showFloatingButton = mutableStateOf(true)
         private set
+
+    init {
+        viewModelScope.launch {
+            dataStoreManager.getSettings(
+                SettingsData(
+                    actionButtonColor = RedLight.value.toLong(),
+                    backroundColor = RedLight.value.toLong(),
+                    bottomBarColor = White.value.toLong(),
+                    bottomBarIconsColor = RedLight.value.toLong()
+                )
+            ).collect { selectedTheme ->
+                actionButtonColor.value = selectedTheme.actionButtonColor.toULong()
+                bottomBarIconsColor.value = selectedTheme.bottomBarIconsColor.toULong()
+            }
+        }
+    }
 
     fun onEvent(event: MainScreenEvent){
         when(event){
             is MainScreenEvent.OnItemSave -> {
                 if (editableText.value.isEmpty() || budgetNumber.value.isEmpty() || budgetNumber.value == "0") return
+                if (budgetNumber.value.toIntOrNull() == null) {
+                    sendUiEvent(UiEvent.ShowSnackBar("В поле <Бюджет> можно писать только числа"))
+                    return
+                }
                 viewModelScope.launch {
                     repository.insertItem(
                         ShoppingListItem(
@@ -62,7 +111,8 @@ class MainScreenViewModel @Inject constructor(
                             getCurrentTime(),
                             0,
                             0,
-                            budgetNumber.value.toInt()
+                            budgetNumber.value.toInt(),
+                            foodCheckBox.value
                         )
                     )
                 }
@@ -89,18 +139,24 @@ class MainScreenViewModel @Inject constructor(
             is DialogEvent.OnCancel -> {
                 openDialog.value = false
                 editableText.value = ""
+                budgetNumber.value = ""
+                foodCheckBox.value = false
             }
             is DialogEvent.OnConfirm -> {
                 onEvent(MainScreenEvent.OnItemSave)
                 openDialog.value = false
                 editableText.value = ""
                 budgetNumber.value = ""
+                foodCheckBox.value = false
             }
             is DialogEvent.OnTextChange -> {
                 editableText.value = event.text
             }
             is DialogEvent.OnBudgetChange -> {
                 budgetNumber.value = event.budget
+            }
+            is DialogEvent.OnCheckedChange -> {
+                foodCheckBox.value = event.food
             }
             else -> {}
         }

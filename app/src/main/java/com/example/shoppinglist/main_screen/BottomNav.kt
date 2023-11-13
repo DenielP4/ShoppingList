@@ -11,12 +11,15 @@ import androidx.compose.ui.res.painterResource
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import com.example.shoppinglist.R
+import com.example.shoppinglist.ui.theme.DarkText
 import com.example.shoppinglist.ui.theme.GrayLight
+import com.example.shoppinglist.ui.theme.LightText
 import com.example.shoppinglist.ui.theme.RedLight
 
 @Composable
 fun BottomNav(
     currentRoute: String?,
+    colorIcons: Color,
     onNavigate: (String) -> Unit
 ) {
     val listItem = listOf(
@@ -41,9 +44,9 @@ fun BottomNav(
                 label = {
                     Text(text = bottomNavItem.title)
                 },
-                selectedContentColor = RedLight,
-                unselectedContentColor = GrayLight,
-                alwaysShowLabel = false
+                selectedContentColor = colorIcons,
+                unselectedContentColor = LightText,
+                alwaysShowLabel = true
             )
         }
     }
