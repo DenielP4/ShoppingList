@@ -1,7 +1,9 @@
 package com.example.shoppinglist.shopping_list_screen
 
 import android.annotation.SuppressLint
+import android.util.Log
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -17,6 +19,10 @@ import androidx.compose.material.rememberScaffoldState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -36,7 +42,6 @@ fun ShoppingListScreen(
     onNavigate: (String) -> Unit
 ) {
     val scaffoldState = rememberScaffoldState()
-    val itemsList = viewModel.list.collectAsState(initial = emptyList())
 
     LaunchedEffect(key1 = true) {
         viewModel.uiEvent.collect { uiEvent ->
@@ -44,6 +49,7 @@ fun ShoppingListScreen(
                 is UiEvent.Navigate -> {
                     onNavigate(uiEvent.route)
                 }
+
                 is UiEvent.ShowSnackBar -> {
                     scaffoldState.snackbarHostState.showSnackbar(
                         uiEvent.message
@@ -54,6 +60,7 @@ fun ShoppingListScreen(
             }
         }
     }
+
 
     Scaffold(
         scaffoldState = scaffoldState,
@@ -67,29 +74,37 @@ fun ShoppingListScreen(
             }
         }
     ) {
-        LazyColumn(
-            modifier = Modifier
-                .fillMaxSize()
-                .background(GrayLight),
-            contentPadding = PaddingValues(bottom = 100.dp)
-        ) {
-            items(itemsList.value) { item ->
-                UiShoppingListItem(item) { event ->
-                    viewModel.onEvent(event)
+        if (viewModel.showLoading.value) {
+            LazyColumn(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(GrayLight),
+                contentPadding = PaddingValues(bottom = 100.dp)
+            ) {
+                items(viewModel.list.value) { item ->
+                    UiShoppingListItem(item) { event ->
+                        viewModel.onEvent(event)
+                    }
                 }
             }
+        } else {
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(GrayLight),
+            ) {
+                Text(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .wrapContentHeight(),
+                    text = "Пустой список",
+                    fontSize = 25.sp,
+                    textAlign = TextAlign.Center,
+                    color = EmptyText
+                )
+            }
+
         }
     }
     MainDialog(viewModel)
-    if (itemsList.value.isEmpty()) {
-        Text(
-            modifier = Modifier
-                .fillMaxSize()
-                .wrapContentHeight(),
-            text = "Пустой список",
-            fontSize = 25.sp,
-            textAlign = TextAlign.Center,
-            color = EmptyText
-        )
-    }
 }

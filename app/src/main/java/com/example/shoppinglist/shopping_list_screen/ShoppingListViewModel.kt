@@ -1,5 +1,6 @@
 package com.example.shoppinglist.shopping_list_screen
 
+import android.util.Log
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
@@ -21,7 +22,18 @@ class ShoppingListViewModel @Inject constructor(
     private val repository: ShoppingListRepository
 ) : ViewModel(), DialogController {
 
-    val list = repository.getAllItems()
+    val list = mutableStateOf<List<ShoppingListItem>>(emptyList())
+    val showLoading = mutableStateOf(true)
+
+    init {
+        viewModelScope.launch {
+            repository.getAllItems().collect { items ->
+                list.value = items
+                showLoading.value = !list.value.isEmpty()
+                Log.d("!!!!!!!", "${showLoading.value}")
+            }
+        }
+    }
 
     private val _uiEvent = Channel<UiEvent>()
     val uiEvent = _uiEvent.receiveAsFlow()

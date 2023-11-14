@@ -34,6 +34,7 @@ class MainScreenViewModel @Inject constructor(
 
     var actionButtonColor = mutableStateOf(RedLight.value)
     var bottomBarIconsColor = mutableStateOf(RedLight.value)
+    val showLoading = mutableStateOf(true)
 
     override var dialogTitle = mutableStateOf("Название списка")
         private set
@@ -91,6 +92,7 @@ class MainScreenViewModel @Inject constructor(
             ).collect { selectedTheme ->
                 actionButtonColor.value = selectedTheme.actionButtonColor.toULong()
                 bottomBarIconsColor.value = selectedTheme.bottomBarIconsColor.toULong()
+                showLoading.value = false
             }
         }
     }

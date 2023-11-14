@@ -83,7 +83,7 @@ fun MainScreen(
             }
         },
         floatingActionButton = {
-            if (viewModel.showFloatingButton.value) {
+            if (viewModel.showFloatingButton.value && !viewModel.showLoading.value) {
                 FloatingActionButton(
                     onClick = {
                         viewModel.onEvent(MainScreenEvent.OnNewItemClick(currentRoute ?: Routes.SHOPPING_LIST))
