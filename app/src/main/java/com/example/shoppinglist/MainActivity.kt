@@ -8,9 +8,12 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.viewModelScope
+import com.example.shoppinglist.datastore.DataStoreManager
 import com.example.shoppinglist.datastore.SettingsData
 import com.example.shoppinglist.main_screen.MainScreen
 import com.example.shoppinglist.navigation.MainNavigationGraph
@@ -22,19 +25,18 @@ import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
-
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
+        val dataStoreManager = DataStoreManager(this)
         setContent {
+            val settings by dataStoreManager.getSettings().collectAsState(initial = SettingsData())
             ShoppingListTheme {
                 // A surface container using the 'background' color from the theme
                 Surface(
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
                 ) {
-                    MainNavigationGraph()
+                    MainNavigationGraph(settings)
                 }
             }
         }

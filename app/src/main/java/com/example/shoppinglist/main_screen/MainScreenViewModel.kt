@@ -32,9 +32,9 @@ class MainScreenViewModel @Inject constructor(
     private val _uiEvent = Channel<UiEvent>()
     val uiEvent = _uiEvent.receiveAsFlow()
 
-    var actionButtonColor = mutableStateOf(RedLight.value)
-    var bottomBarIconsColor = mutableStateOf(RedLight.value)
-    val showLoading = mutableStateOf(true)
+//    var actionButtonColor = mutableStateOf(RedLight.value)
+//    var bottomBarIconsColor = mutableStateOf(RedLight.value)
+//    val showLoading = mutableStateOf(true)
 
     override var dialogTitle = mutableStateOf("Название списка")
         private set
@@ -80,22 +80,22 @@ class MainScreenViewModel @Inject constructor(
     var showFloatingButton = mutableStateOf(true)
         private set
 
-    init {
-        viewModelScope.launch {
-            dataStoreManager.getSettings(
-                SettingsData(
-                    actionButtonColor = RedLight.value.toLong(),
-                    backroundColor = RedLight.value.toLong(),
-                    bottomBarColor = White.value.toLong(),
-                    bottomBarIconsColor = RedLight.value.toLong()
-                )
-            ).collect { selectedTheme ->
-                actionButtonColor.value = selectedTheme.actionButtonColor.toULong()
-                bottomBarIconsColor.value = selectedTheme.bottomBarIconsColor.toULong()
-                showLoading.value = false
-            }
-        }
-    }
+//    init {
+//        viewModelScope.launch {
+//            dataStoreManager.getSettings(
+//                SettingsData(
+//                    actionButtonColor = RedLight.value.toLong(),
+//                    backroundColor = RedLight.value.toLong(),
+//                    bottomBarColor = White.value.toLong(),
+//                    bottomBarIconsColor = RedLight.value.toLong()
+//                )
+//            ).collect { selectedTheme ->
+//                actionButtonColor.value = selectedTheme.actionButtonColor.toULong()
+//                bottomBarIconsColor.value = selectedTheme.bottomBarIconsColor.toULong()
+//                showLoading.value = false
+//            }
+//        }
+//    }
 
     fun onEvent(event: MainScreenEvent){
         when(event){

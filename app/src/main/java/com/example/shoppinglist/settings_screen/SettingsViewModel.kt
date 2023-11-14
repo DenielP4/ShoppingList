@@ -20,14 +20,7 @@ class SettingsViewModel @Inject constructor(
 
     val colorItemListState = mutableStateOf<List<ColorItem>>(emptyList())
     val colorThemeListState = mutableStateOf<List<ThemeItem>>(emptyList())
-    val currentSetting = mutableStateOf(
-        SettingsData(
-            actionButtonColor = RedLight.value.toLong(),
-            backroundColor = GrayLight.value.toLong(),
-            bottomBarColor = White.value.toLong(),
-            bottomBarIconsColor = RedLight.value.toLong()
-        )
-    )
+    val currentSetting = mutableStateOf(SettingsData())
 
     init {
 
@@ -51,14 +44,7 @@ class SettingsViewModel @Inject constructor(
                 }
         }
         viewModelScope.launch {
-            dataStoreManager.getSettings(
-                SettingsData(
-                    actionButtonColor = RedLight.value.toLong(),
-                    backroundColor = GrayLight.value.toLong(),
-                    bottomBarColor = White.value.toLong(),
-                    bottomBarIconsColor = RedLight.value.toLong()
-                )
-            )
+            dataStoreManager.getSettings()
                 .collect { selectedTheme ->
                     val tempSettingsItemList = ArrayList<ThemeItem>()
                     Log.d("Theme", "${ColorUtils.themeList.keys}")
@@ -96,6 +82,8 @@ class SettingsViewModel @Inject constructor(
                     )
                 }
             }
+
+            else -> {}
         }
     }
 }

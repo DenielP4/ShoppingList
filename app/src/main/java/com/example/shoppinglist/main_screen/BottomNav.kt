@@ -19,7 +19,7 @@ import com.example.shoppinglist.ui.theme.RedLight
 @Composable
 fun BottomNav(
     currentRoute: String?,
-    colorIcons: Color,
+    colorIcons: ULong,
     onNavigate: (String) -> Unit
 ) {
     val listItem = listOf(
@@ -44,7 +44,7 @@ fun BottomNav(
                 label = {
                     Text(text = bottomNavItem.title)
                 },
-                selectedContentColor = colorIcons,
+                selectedContentColor = Color(colorIcons),
                 unselectedContentColor = LightText,
                 alwaysShowLabel = true
             )

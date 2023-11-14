@@ -27,22 +27,22 @@ object ColorUtils {
 
     val themeList: Map<String, SettingsData> = mapOf(
         "#C31E12" to SettingsData(
-            actionButtonColor = RedLight.value.toLong(),
-            backroundColor = RedLight.value.toLong(),
-            bottomBarColor = White.value.toLong(),
-            bottomBarIconsColor = RedLight.value.toLong()
+            actionButtonColor = RedLight.value,
+            backroundColor = RedLight.value,
+            bottomBarColor = White.value,
+            bottomBarIconsColor = RedLight.value
         ),
         "#041cf6" to SettingsData(
-            actionButtonColor = BlueLight.value.toLong(),
-            backroundColor = BlueLight.value.toLong(),
-            bottomBarColor = White.value.toLong(),
-            bottomBarIconsColor = BlueLight.value.toLong()
+            actionButtonColor = BlueLight.value,
+            backroundColor = BlueLight.value,
+            bottomBarColor = White.value,
+            bottomBarIconsColor = BlueLight.value
         ),
         "#24C312" to SettingsData(
-            actionButtonColor = GreenLight.value.toLong(),
-            backroundColor = GreenLight.value.toLong(),
-            bottomBarColor = White.value.toLong(),
-            bottomBarIconsColor = GreenLight.value.toLong()
+            actionButtonColor = GreenLight.value,
+            backroundColor = GreenLight.value,
+            bottomBarColor = White.value,
+            bottomBarIconsColor = GreenLight.value
         )
     )
 

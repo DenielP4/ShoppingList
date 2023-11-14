@@ -34,7 +34,7 @@ fun SettingsScreen(
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(16.dp).background(Color(viewModel.currentSetting.value.backroundColor))
+                    .padding(16.dp)
             ) {
                 Text(
                     text = "Цвет заголовка",
