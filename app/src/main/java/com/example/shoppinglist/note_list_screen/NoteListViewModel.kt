@@ -17,6 +17,7 @@ import com.example.shoppinglist.utils.Routes
 import com.example.shoppinglist.utils.UiEvent
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
@@ -109,6 +110,11 @@ class NoteListViewModel @Inject constructor(
             }
             is NoteListEvent.OnItemClick -> {
                 sendUiEvent(UiEvent.Navigate(event.route))
+                viewModelScope.launch {
+                    delay(1000)
+                    searchText = ""
+                    noteList = originNoteList
+                }
             }
             is NoteListEvent.UnDoneDeleteItem -> {
                 viewModelScope.launch {
